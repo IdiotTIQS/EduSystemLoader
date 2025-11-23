@@ -2,6 +2,7 @@ package com.tiqs.controller;
 
 import com.tiqs.entity.ClassEntity;
 import com.tiqs.service.ClassService;
+import com.tiqs.common.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -14,15 +15,15 @@ public class ClassController {
     public ClassController(ClassService classService){this.classService=classService;}
 
     @PostMapping
-    public com.tiqs.handler.ApiResponse<ClassEntity> create(@RequestBody ClassEntity cls){log.info("请求创建班级 name={}", cls.getName()); return com.tiqs.handler.ApiResponse.ok(classService.create(cls));}    
+    public ApiResponse<ClassEntity> create(@RequestBody ClassEntity cls){log.info("请求创建班级 name={}", cls.getName()); return ApiResponse.ok(classService.create(cls));}
     @GetMapping("/{id}")
-    public com.tiqs.handler.ApiResponse<ClassEntity> get(@PathVariable Long id){log.debug("获取班级详情 id={}", id); return com.tiqs.handler.ApiResponse.ok(classService.get(id));}    
+    public ApiResponse<ClassEntity> get(@PathVariable Long id){log.debug("获取班级详情 id={}", id); return ApiResponse.ok(classService.get(id));}
     @GetMapping("/teacher/{teacherId}")
-    public com.tiqs.handler.ApiResponse<List<ClassEntity>> listByTeacher(@PathVariable Long teacherId){log.debug("查询教师的班级列表 teacherId={}", teacherId); return com.tiqs.handler.ApiResponse.ok(classService.listByTeacher(teacherId));}    
+    public ApiResponse<List<ClassEntity>> listByTeacher(@PathVariable Long teacherId){log.debug("查询教师的班级列表 teacherId={}", teacherId); return ApiResponse.ok(classService.listByTeacher(teacherId));}
     @PutMapping("/{id}")
-    public com.tiqs.handler.ApiResponse<ClassEntity> updateName(@PathVariable Long id,@RequestParam String name){log.info("更新班级名称 id={} name={}", id,name); return com.tiqs.handler.ApiResponse.ok(classService.updateName(id,name));}    
+    public ApiResponse<ClassEntity> updateName(@PathVariable Long id,@RequestParam String name){log.info("更新班级名称 id={} name={}", id,name); return ApiResponse.ok(classService.updateName(id,name));}
     @DeleteMapping("/{id}")
-    public com.tiqs.handler.ApiResponse<Void> delete(@PathVariable Long id){log.warn("删除班级 id={}", id); classService.delete(id); return com.tiqs.handler.ApiResponse.ok(null);}    
+    public ApiResponse<Void> delete(@PathVariable Long id){log.warn("删除班级 id={}", id); classService.delete(id); return ApiResponse.ok(null);}
     @GetMapping("/code/{code}")
-    public com.tiqs.handler.ApiResponse<ClassEntity> findByCode(@PathVariable String code){log.debug("按邀请码查询班级 code={}", code); return com.tiqs.handler.ApiResponse.ok(classService.findByCode(code));}    
+    public ApiResponse<ClassEntity> findByCode(@PathVariable String code){log.debug("按邀请码查询班级 code={}", code); return ApiResponse.ok(classService.findByCode(code));}
 }
