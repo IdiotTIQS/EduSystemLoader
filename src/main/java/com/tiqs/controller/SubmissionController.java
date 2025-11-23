@@ -17,4 +17,8 @@ public class SubmissionController {
     public List<Submission> listByAssignment(@RequestParam Long assignmentId){return submissionService.listByAssignment(assignmentId);}    
     @GetMapping("/unique")
     public Submission findUnique(@RequestParam Long assignmentId,@RequestParam Long studentId){return submissionService.findUnique(assignmentId,studentId);}    
+    @PutMapping("/{id}")
+    public Submission updateContent(@PathVariable Long id,@RequestBody Submission s){return submissionService.updateContent(id,s.getFilePath(),s.getAnswerText());}
+    @PutMapping("/{id}/grade")
+    public Submission grade(@PathVariable Long id,@RequestParam Double score,@RequestParam(required=false) String feedback){return submissionService.grade(id,score,feedback);}    
 }
