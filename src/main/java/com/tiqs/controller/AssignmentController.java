@@ -14,13 +14,13 @@ public class AssignmentController {
     public AssignmentController(AssignmentService assignmentService){this.assignmentService=assignmentService;}
 
     @PostMapping
-    public Assignment create(@RequestBody Assignment a){log.info("Create assignment course={} title={}", a.getCourseId(),a.getTitle()); return assignmentService.create(a);}    
+    public Assignment create(@RequestBody Assignment a){log.info("请求创建作业 courseId={} title={}", a.getCourseId(),a.getTitle()); return assignmentService.create(a);}    
     @GetMapping("/{id}")
-    public Assignment get(@PathVariable Long id){log.debug("Get assignment {}", id); return assignmentService.get(id);}    
+    public Assignment get(@PathVariable Long id){log.debug("获取作业详情 id={}", id); return assignmentService.get(id);}    
     @GetMapping
-    public List<Assignment> listByCourse(@RequestParam Long courseId){log.debug("List assignments course={}", courseId); return assignmentService.listByCourse(courseId);}    
+    public List<Assignment> listByCourse(@RequestParam Long courseId){log.debug("查询课程下作业列表 courseId={}", courseId); return assignmentService.listByCourse(courseId);}    
     @PutMapping("/{id}")
-    public Assignment update(@PathVariable Long id,@RequestBody Assignment a){a.setId(id); log.info("Update assignment {}", id); return assignmentService.update(a);}    
+    public Assignment update(@PathVariable Long id,@RequestBody Assignment a){a.setId(id); log.info("更新作业 id={}", id); return assignmentService.update(a);}    
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){log.warn("Delete assignment {}", id); assignmentService.delete(id);}    
+    public void delete(@PathVariable Long id){log.warn("删除作业 id={}", id); assignmentService.delete(id);}    
 }

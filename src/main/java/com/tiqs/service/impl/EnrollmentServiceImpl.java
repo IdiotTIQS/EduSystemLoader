@@ -17,8 +17,8 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Transactional
     public Enrollment enroll(Long classId,Long studentId){
         Enrollment existing = enrollmentMapper.findUnique(classId,studentId);
-        if(existing!=null){log.info("Student {} already enrolled in class {}", studentId, classId); return existing;}
-        Enrollment e = new Enrollment(); e.setClassId(classId); e.setStudentId(studentId); enrollmentMapper.insert(e); log.info("Enrolled student {} into class {}", studentId, classId); return e;
+        if(existing!=null){log.info("学生已加入班级 studentId={} classId={}", studentId, classId); return existing;}
+        Enrollment e = new Enrollment(); e.setClassId(classId); e.setStudentId(studentId); enrollmentMapper.insert(e); log.info("学生加入班级成功 studentId={} classId={}", studentId, classId); return e;
     }
     public List<Enrollment> listByClass(Long classId){return enrollmentMapper.findByClass(classId);}    
     public Enrollment findUnique(Long classId,Long studentId){return enrollmentMapper.findUnique(classId,studentId);}    

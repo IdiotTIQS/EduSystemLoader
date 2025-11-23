@@ -15,21 +15,21 @@ public class SubmissionServiceImpl implements SubmissionService {
     public SubmissionServiceImpl(SubmissionMapper submissionMapper){this.submissionMapper=submissionMapper;}
 
     @Transactional
-    public Submission submit(Submission s){submissionMapper.insert(s); log.info("Submission created assignment={} student={}", s.getAssignmentId(), s.getStudentId()); return submissionMapper.findUnique(s.getAssignmentId(), s.getStudentId());}
+    public Submission submit(Submission s){submissionMapper.insert(s); log.info("提交作业成功 assignmentId={} studentId={}", s.getAssignmentId(), s.getStudentId()); return submissionMapper.findUnique(s.getAssignmentId(), s.getStudentId());}
     public Submission findUnique(Long assignmentId,Long studentId){return submissionMapper.findUnique(assignmentId,studentId);}    
     public List<Submission> listByAssignment(Long assignmentId){return submissionMapper.findByAssignment(assignmentId);}    
     @Transactional
     public Submission updateContent(Long id,String filePath,String answerText){
         Submission s = new Submission();
         s.setId(id); s.setFilePath(filePath); s.setAnswerText(answerText);
-        submissionMapper.updateContent(s); log.info("Updated submission {} content", id);
+        submissionMapper.updateContent(s); log.info("更新提交内容成功 submissionId={}", id);
         return s;
     }
     @Transactional
     public Submission grade(Long id,Double score,String feedback){
         Submission s = new Submission();
         s.setId(id); s.setScore(score); s.setFeedback(feedback);
-        submissionMapper.grade(s); log.info("Graded submission {} score={}", id, score);
+        submissionMapper.grade(s); log.info("评分成功 submissionId={} score={}", id, score);
         return s;
     }
 }

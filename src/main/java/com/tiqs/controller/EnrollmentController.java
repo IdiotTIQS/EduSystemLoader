@@ -14,9 +14,9 @@ public class EnrollmentController {
     public EnrollmentController(EnrollmentService enrollmentService){this.enrollmentService=enrollmentService;}
 
     @PostMapping
-    public Enrollment enroll(@RequestParam Long classId,@RequestParam Long studentId){log.info("Enroll student {} to class {}", studentId,classId); return enrollmentService.enroll(classId,studentId);}    
+    public Enrollment enroll(@RequestParam Long classId,@RequestParam Long studentId){log.info("学生加入班级 studentId={} classId={}", studentId,classId); return enrollmentService.enroll(classId,studentId);}    
     @GetMapping("/class/{classId}")
-    public List<Enrollment> list(@PathVariable Long classId){log.debug("List enrollments class {}", classId); return enrollmentService.listByClass(classId);}    
+    public List<Enrollment> list(@PathVariable Long classId){log.debug("查询班级成员列表 classId={}", classId); return enrollmentService.listByClass(classId);}    
     @GetMapping("/unique")
-    public Enrollment findUnique(@RequestParam Long classId,@RequestParam Long studentId){log.debug("Check enrollment class={} student={}", classId,studentId); return enrollmentService.findUnique(classId,studentId);}    
+    public Enrollment findUnique(@RequestParam Long classId,@RequestParam Long studentId){log.debug("检查学生是否已加入 classId={} studentId={}", classId,studentId); return enrollmentService.findUnique(classId,studentId);}    
 }

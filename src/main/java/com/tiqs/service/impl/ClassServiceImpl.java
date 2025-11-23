@@ -16,14 +16,14 @@ public class ClassServiceImpl implements ClassService {
 
     @Transactional
     public ClassEntity create(ClassEntity cls){
-        classMapper.insert(cls); log.info("Created class id={} code={}", cls.getId(), cls.getCode()); return cls;
+        classMapper.insert(cls); log.info("创建班级成功 id={} code={}", cls.getId(), cls.getCode()); return cls;
     }
-    public List<ClassEntity> listByTeacher(Long teacherId){log.debug("List classes by teacher {}", teacherId); return classMapper.findByTeacher(teacherId);}    
+    public List<ClassEntity> listByTeacher(Long teacherId){log.debug("按教师查询班级 teacherId={}", teacherId); return classMapper.findByTeacher(teacherId);}    
     public ClassEntity get(Long id){return classMapper.findById(id);}    
     @Transactional
     public ClassEntity updateName(Long id,String name){
-        ClassEntity c = classMapper.findById(id); if(c==null){log.warn("Class {} not found for update", id); return null;} c.setName(name); classMapper.updateName(c); log.info("Updated class {} name to {}", id, name); return c;}
+        ClassEntity c = classMapper.findById(id); if(c==null){log.warn("更新失败，班级不存在 id={}", id); return null;} c.setName(name); classMapper.updateName(c); log.info("更新班级名称成功 id={} name={}", id, name); return c;}
     @Transactional
-    public void delete(Long id){classMapper.delete(id); log.info("Deleted class {}", id);}    
+    public void delete(Long id){classMapper.delete(id); log.info("删除班级成功 id={}", id);}    
     public ClassEntity findByCode(String code){return classMapper.findByCode(code);}    
 }
