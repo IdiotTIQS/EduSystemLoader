@@ -14,13 +14,13 @@ public class AssignmentController {
     public AssignmentController(AssignmentService assignmentService){this.assignmentService=assignmentService;}
 
     @PostMapping
-    public Assignment create(@RequestBody Assignment a){log.info("请求创建作业 courseId={} title={}", a.getCourseId(),a.getTitle()); return assignmentService.create(a);}    
+    public com.tiqs.handler.ApiResponse<Assignment> create(@RequestBody Assignment a){log.info("请求创建作业 courseId={} title={}", a.getCourseId(),a.getTitle()); return com.tiqs.handler.ApiResponse.ok(assignmentService.create(a));}    
     @GetMapping("/{id}")
-    public Assignment get(@PathVariable Long id){log.debug("获取作业详情 id={}", id); return assignmentService.get(id);}    
+    public com.tiqs.handler.ApiResponse<Assignment> get(@PathVariable Long id){log.debug("获取作业详情 id={}", id); return com.tiqs.handler.ApiResponse.ok(assignmentService.get(id));}    
     @GetMapping
-    public List<Assignment> listByCourse(@RequestParam Long courseId){log.debug("查询课程下作业列表 courseId={}", courseId); return assignmentService.listByCourse(courseId);}    
+    public com.tiqs.handler.ApiResponse<List<Assignment>> listByCourse(@RequestParam Long courseId){log.debug("查询课程下作业列表 courseId={}", courseId); return com.tiqs.handler.ApiResponse.ok(assignmentService.listByCourse(courseId));}    
     @PutMapping("/{id}")
-    public Assignment update(@PathVariable Long id,@RequestBody Assignment a){a.setId(id); log.info("更新作业 id={}", id); return assignmentService.update(a);}    
+    public com.tiqs.handler.ApiResponse<Assignment> update(@PathVariable Long id,@RequestBody Assignment a){a.setId(id); log.info("更新作业 id={}", id); return com.tiqs.handler.ApiResponse.ok(assignmentService.update(a));}    
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){log.warn("删除作业 id={}", id); assignmentService.delete(id);}    
+    public com.tiqs.handler.ApiResponse<Void> delete(@PathVariable Long id){log.warn("删除作业 id={}", id); assignmentService.delete(id); return com.tiqs.handler.ApiResponse.ok(null);}    
 }
