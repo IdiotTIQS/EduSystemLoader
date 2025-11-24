@@ -1,8 +1,10 @@
 package com.tiqs.controller;
 
+import com.tiqs.auth.RequireRole;
+import com.tiqs.auth.UserRole;
+import com.tiqs.common.ApiResponse;
 import com.tiqs.entity.Enrollment;
 import com.tiqs.service.EnrollmentService;
-import com.tiqs.common.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -14,8 +16,10 @@ public class EnrollmentController {
     private final EnrollmentService enrollmentService;
     public EnrollmentController(EnrollmentService enrollmentService){this.enrollmentService=enrollmentService;}
 
+    @RequireRole(UserRole.STUDENT)
     @PostMapping
     public ApiResponse<Enrollment> enroll(@RequestParam Long classId,@RequestParam Long studentId){log.info("学生加入班级 studentId={} classId={}", studentId,classId); return ApiResponse.ok(enrollmentService.enroll(classId,studentId));}
+    @RequireRole(UserRole.TEACHER)
     @GetMapping("/class/{classId}")
     public ApiResponse<List<Enrollment>> list(@PathVariable Long classId){log.debug("查询班级成员列表 classId={}", classId); return ApiResponse.ok(enrollmentService.listByClass(classId));}
     @GetMapping("/unique")

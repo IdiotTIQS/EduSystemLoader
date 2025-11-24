@@ -22,6 +22,28 @@
 | message | string | 信息 |
 | data | object | 具体数据 |
 
+## 鉴权说明
+所有 `/api/**` 接口必须携带以下请求头：
+- `X-User-Id`：当前用户ID (Long)
+- `X-User-Role`：`TEACHER` 或 `STUDENT`
+
+权限概览：
+- **教师角色**：允许访问/操作 `POST|PUT|DELETE /api/assignments/**`、`POST|PUT|DELETE /api/classes/**`、`GET /api/classes/teacher/{teacherId}`、`POST|PUT|DELETE /api/courses/**`、`GET /api/enrollments/class/{classId}`、`GET /api/submissions`、`PUT /api/submissions/{id}/grade`。
+- **学生角色**：允许访问 `POST /api/enrollments`、`POST /api/submissions`、`PUT /api/submissions/{id}`。
+- **通用接口**：未列出的其余 GET/查询接口支持教师与学生共同访问 (如 `/unique`、资源详情查询等)。
+
+鉴权失败会返回 `401` 状态码以及 `{code:401,message:"无权限"}` 结构。
+
+### 认证接口
+| 方法 | 路径 | 说明 | 请求体 | 返回 data |
+|------|------|------|--------|-----------|
+| POST | /api/auth/register | 用户注册（教师/学生） | `{username,password,role,realName?,email?,phone?}` | `{userId,username,role,realName,email,phone}` |
+| POST | /api/auth/login | 用户登录 | `{username,password}` | `{userId,username,role,realName,email,phone}` |
+| GET | /api/users/profile | 获取当前用户资料 | - | `UserProfile{userId,realName,email,phone}` |
+| PUT | /api/users/profile | 更新用户资料 | `{realName?,email?,phone?}` | `UserProfile` |
+
+> `/api/auth/**` 接口无需携带鉴权头，其余接口保持原有策略。
+
 ## 接口详情
 
 * <span id="assignments">作业接口</span>
