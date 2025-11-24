@@ -1,219 +1,45 @@
 <script setup>
 import { onMounted, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import {
-  assignmentApi,
-  authApi,
-  classApi,
-  courseApi,
-  enrollmentApi,
-  submissionApi,
-} from '../services/api';
-import {
-  clearAuth,
-  getAuth,
-  getStudentClasses,
-  saveStudentClasses,
-} from '../services/auth';
+import { assignmentApi, authApi, classApi, courseApi, enrollmentApi, submissionApi } from '../services/api';
+import { clearAuth, getAuth, getStudentClasses, saveStudentClasses } from '../services/auth';
 
 const router = useRouter();
 const auth = getAuth();
-
-if (!auth.userId || auth.role !== 'STUDENT') {
-  router.replace('/login');
-}
+if (!auth.userId || auth.role !== 'STUDENT') { router.replace('/login'); }
 
 const toast = reactive({ type: 'info', text: '' });
+const showToast = (type, text) => { toast.type = type; toast.text = text; setTimeout(() => { toast.text=''; }, 3500); };
+
 const emptyProfile = { realName: '', email: '', phone: '' };
 const state = reactive({
-  joinedClasses: getStudentClasses(),
-  currentClassId: '',
-  courses: [],
-  currentCourseId: '',
-  assignments: [],
-  currentAssignmentId: '',
-  mySubmission: null,
-  profile: { ...emptyProfile },
+  joinedClasses: getStudentClasses(), currentClassId: '', courses: [], currentCourseId: '', assignments: [], currentAssignmentId: '', mySubmission: null, profile: { ...emptyProfile }
 });
 
 const joinForm = reactive({ code: '' });
 const submissionForm = reactive({ answerText: '', filePath: '' });
 const loading = reactive({ courses: false, assignments: false, submission: false });
 
-const showToast = (type, text) => {
-  toast.type = type;
-  toast.text = text;
-  setTimeout(() => {
-    toast.text = '';
-  }, 3500);
-};
+const logout = () => { clearAuth(); router.replace('/login'); };
+const persistClasses = () => { saveStudentClasses(state.joinedClasses); };
 
-const logout = () => {
-  clearAuth();
-  router.replace('/login');
-};
+const fetchProfile = async () => { try { const profile = await authApi.getProfile(); state.profile = profile || { ...emptyProfile }; } catch (e){ showToast('error', e.message || '获取个人信息失败'); } };
 
-const persistClasses = () => {
-  saveStudentClasses(state.joinedClasses);
-};
+const joinClass = async () => { if(!joinForm.code){ showToast('warning','请输入班级邀请码'); return; } try { const cls = await classApi.findByCode(joinForm.code); await enrollmentApi.enroll(cls.id, auth.userId); if(!state.joinedClasses.find(c=>c.id===cls.id)){ state.joinedClasses.push(cls); persistClasses(); } state.currentClassId = cls.id; joinForm.code=''; showToast('success', `加入班级 ${cls.name} 成功`); await fetchCourses(); } catch(e){ showToast('error', e.message || '加入班级失败'); } };
 
-const fetchProfile = async () => {
-  try {
-    const profile = await authApi.getProfile();
-    state.profile = profile || { ...emptyProfile };
-  } catch (error) {
-    showToast('error', error.message || '获取个人信息失败');
-  }
-};
+const fetchCourses = async () => { if(!state.currentClassId){ state.courses=[]; return; } loading.courses=true; try { state.courses = await courseApi.listByClass(state.currentClassId); if(!state.currentCourseId && state.courses.length>0){ state.currentCourseId = state.courses[0].id; } } catch(e){ showToast('error', e.message || '获取课程失败'); } finally { loading.courses=false; } };
 
-const joinClass = async () => {
-  if (!joinForm.code) {
-    showToast('warning', '请输入班级邀请码');
-    return;
-  }
-  try {
-    const cls = await classApi.findByCode(joinForm.code);
-    await enrollmentApi.enroll(cls.id, auth.userId);
-    if (!state.joinedClasses.find((c) => c.id === cls.id)) {
-      state.joinedClasses.push(cls);
-      persistClasses();
-    }
-    state.currentClassId = cls.id;
-    joinForm.code = '';
-    showToast('success', `加入班级 ${cls.name} 成功`);
-    await fetchCourses();
-  } catch (error) {
-    showToast('error', error.message || '加入班级失败');
-  }
-};
+const fetchAssignments = async () => { if(!state.currentCourseId){ state.assignments=[]; state.currentAssignmentId=''; state.mySubmission=null; return; } loading.assignments=true; try { state.assignments = await assignmentApi.listByCourse(state.currentCourseId); state.currentAssignmentId = state.assignments[0]?.id || ''; state.mySubmission=null; if(state.currentAssignmentId){ await loadMySubmission(state.currentAssignmentId); } } catch(e){ showToast('error', e.message || '获取作业失败'); } finally { loading.assignments=false; } };
 
-const fetchCourses = async () => {
-  if (!state.currentClassId) {
-    state.courses = [];
-    return;
-  }
-  loading.courses = true;
-  try {
-    state.courses = await courseApi.listByClass(state.currentClassId);
-    if (!state.currentCourseId && state.courses.length > 0) {
-      state.currentCourseId = state.courses[0].id;
-    }
-  } catch (error) {
-    showToast('error', error.message || '获取课程失败');
-  } finally {
-    loading.courses = false;
-  }
-};
+const loadMySubmission = async (assignmentId) => { if(!assignmentId) return; state.currentAssignmentId=assignmentId; try { state.mySubmission = await submissionApi.findUnique(assignmentId, auth.userId); if(state.mySubmission){ submissionForm.answerText = state.mySubmission.answerText || ''; submissionForm.filePath = state.mySubmission.filePath || ''; } else { submissionForm.answerText=''; submissionForm.filePath=''; } } catch(e){ showToast('error', e.message || '获取作业提交失败'); } };
 
-const fetchAssignments = async () => {
-  if (!state.currentCourseId) {
-    state.assignments = [];
-    state.currentAssignmentId = '';
-    state.mySubmission = null;
-    return;
-  }
-  loading.assignments = true;
-  try {
-    state.assignments = await assignmentApi.listByCourse(state.currentCourseId);
-    state.currentAssignmentId = state.assignments[0]?.id || '';
-    state.mySubmission = null;
-    if (state.currentAssignmentId) {
-      await loadMySubmission(state.currentAssignmentId);
-    }
-  } catch (error) {
-    showToast('error', error.message || '获取作业失败');
-  } finally {
-    loading.assignments = false;
-  }
-};
+const submitAssignment = async (assignmentId = state.currentAssignmentId) => { if(!assignmentId){ showToast('warning','请选择作业'); return; } if(!submissionForm.answerText && !submissionForm.filePath){ showToast('warning','请输入答案或上传链接'); return; } loading.submission=true; try { if(state.mySubmission){ await submissionApi.updateContent(state.mySubmission.id,{ answerText: submissionForm.answerText, filePath: submissionForm.filePath }); showToast('success','已更新提交内容'); } else { await submissionApi.submit({ assignmentId, studentId: auth.userId, answerText: submissionForm.answerText, filePath: submissionForm.filePath }); showToast('success','作业提交成功'); } await loadMySubmission(assignmentId); } catch(e){ showToast('error', e.message || '提交失败'); } finally { loading.submission=false; } };
 
-const loadMySubmission = async (assignmentId) => {
-  if (!assignmentId) return;
-  state.currentAssignmentId = assignmentId;
-  try {
-    state.mySubmission = await submissionApi.findUnique(assignmentId, auth.userId);
-    if (state.mySubmission) {
-      submissionForm.answerText = state.mySubmission.answerText || '';
-      submissionForm.filePath = state.mySubmission.filePath || '';
-    } else {
-      submissionForm.answerText = '';
-      submissionForm.filePath = '';
-    }
-  } catch (error) {
-    showToast('error', error.message || '获取作业提交失败');
-  }
-};
+const saveProfileForm = async () => { try { const payload = { realName: state.profile.realName, email: state.profile.email, phone: state.profile.phone }; state.profile = await authApi.updateProfile(payload); showToast('success','个人信息已更新'); } catch(e){ showToast('error', e.message || '保存失败'); } };
 
-const submitAssignment = async (assignmentId = state.currentAssignmentId) => {
-  if (!assignmentId) {
-    showToast('warning', '请选择作业');
-    return;
-  }
-  if (!submissionForm.answerText && !submissionForm.filePath) {
-    showToast('warning', '请输入答案或上传链接');
-    return;
-  }
-  loading.submission = true;
-  try {
-    if (state.mySubmission) {
-      await submissionApi.updateContent(state.mySubmission.id, {
-        answerText: submissionForm.answerText,
-        filePath: submissionForm.filePath,
-      });
-      showToast('success', '已更新提交内容');
-    } else {
-      await submissionApi.submit({
-        assignmentId,
-        studentId: auth.userId,
-        answerText: submissionForm.answerText,
-        filePath: submissionForm.filePath,
-      });
-      showToast('success', '作业提交成功');
-    }
-    await loadMySubmission(assignmentId);
-  } catch (error) {
-    showToast('error', error.message || '提交失败');
-  } finally {
-    loading.submission = false;
-  }
-};
-
-const saveProfileForm = async () => {
-  try {
-    const payload = {
-      realName: state.profile.realName,
-      email: state.profile.email,
-      phone: state.profile.phone,
-    };
-    state.profile = await authApi.updateProfile(payload);
-    showToast('success', '个人信息已更新');
-  } catch (error) {
-    showToast('error', error.message || '保存失败');
-  }
-};
-
-onMounted(async () => {
-  await fetchProfile();
-  if (state.joinedClasses.length > 0) {
-    state.currentClassId = state.joinedClasses[0].id;
-  }
-});
-
-watch(
-  () => state.currentClassId,
-  async () => {
-    state.currentCourseId = '';
-    await fetchCourses();
-    await fetchAssignments();
-  }
-);
-
-watch(
-  () => state.currentCourseId,
-  async () => {
-    await fetchAssignments();
-  }
-);
+onMounted(async () => { await fetchProfile(); if(state.joinedClasses.length>0){ state.currentClassId = state.joinedClasses[0].id; } });
+watch(() => state.currentClassId, async () => { state.currentCourseId=''; await fetchCourses(); await fetchAssignments(); });
+watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
 </script>
 
 <template>
@@ -225,11 +51,7 @@ watch(
       </div>
       <button class="secondary" @click="logout">退出登录</button>
     </div>
-
-    <div v-if="toast.text" :class="['notification', toast.type]">
-      {{ toast.text }}
-    </div>
-
+    <div v-if="toast.text" :class="['notification', toast.type]">{{ toast.text }}</div>
     <div class="card">
       <div class="section-title">
         <h3>加入班级</h3>
@@ -353,25 +175,30 @@ watch(
     <div class="card">
       <div class="section-title">
         <h3>个人信息</h3>
-        <span>信息将同步到服务器，教师端可用于联系确认</span>
+        <span>信息同步服务器，教师端可用于联系</span>
       </div>
       <form class="form-grid" @submit.prevent="saveProfileForm">
         <label>
-          昵称
-          <input v-model="state.profile.nickname" />
+          真实姓名
+          <input v-model="state.profile.realName" placeholder="输入真实姓名" />
         </label>
         <label>
           邮箱
-          <input v-model="state.profile.email" type="email" />
+          <input v-model="state.profile.email" type="email" placeholder="用于接收通知" />
         </label>
-        <label style="grid-column: 1 / -1;">
-          个人简介
-          <textarea v-model="state.profile.bio"></textarea>
+        <label>
+          手机号
+          <input v-model="state.profile.phone" placeholder="选填" />
         </label>
-        <div style="grid-column: 1 / -1;">
+        <div style="grid-column: 1 / -1; display:flex; gap:.75rem;">
           <button class="primary" type="submit">保存信息</button>
+          <button class="secondary" type="button" @click="fetchProfile">重新加载</button>
         </div>
       </form>
     </div>
   </section>
 </template>
+
+<style scoped>
+/* 保留其他样式 */
+</style>

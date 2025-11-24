@@ -18,6 +18,13 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(401, ex.getMessage());
     }
 
+    @ExceptionHandler(com.tiqs.common.BusinessException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public ApiResponse<Void> handleBiz(com.tiqs.common.BusinessException ex){
+        log.info("业务处理失败: {}", ex.getMessage());
+        return ApiResponse.error(ex.getCode(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ApiResponse<Void> handle(Exception ex){
         log.error("系统未处理异常", ex);
