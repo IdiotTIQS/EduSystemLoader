@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { assignmentApi, authApi, classApi, courseApi, enrollmentApi, submissionApi } from '../services/api';
 import { clearAuth, getAuth, getStudentClasses, saveStudentClasses } from '../services/auth';
@@ -7,6 +7,8 @@ import { clearAuth, getAuth, getStudentClasses, saveStudentClasses } from '../se
 const router = useRouter();
 const auth = getAuth();
 if (!auth.userId || auth.role !== 'STUDENT') { router.replace('/login'); }
+
+const currentPage = ref('classes');
 
 const toast = reactive({ type: 'info', text: '' });
 const showToast = (type, text) => { toast.type = type; toast.text = text; setTimeout(() => { toast.text=''; }, 3500); };
@@ -19,6 +21,30 @@ const state = reactive({
 const joinForm = reactive({ code: '' });
 const submissionForm = reactive({ answerText: '', filePath: '' });
 const loading = reactive({ courses: false, assignments: false, submission: false });
+
+const switchPage = (page) => {
+  currentPage.value = page;
+};
+
+const pageTitle = computed(() => {
+  const titles = {
+    classes: '我的班级',
+    courses: '课程信息',
+    assignments: '作业提交',
+    profile: '个人信息'
+  };
+  return titles[currentPage.value] || '学习空间';
+});
+
+const pageSubtitle = computed(() => {
+  const subtitles = {
+    classes: '加入班级并查看班级信息',
+    courses: '查看已加入班级的课程',
+    assignments: '查看和提交作业',
+    profile: '管理个人信息和联系方式'
+  };
+  return subtitles[currentPage.value] || '学生端学习空间';
+});
 
 const logout = () => { clearAuth(); router.replace('/login'); };
 const persistClasses = () => { saveStudentClasses(state.joinedClasses); };
@@ -43,162 +69,325 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
 </script>
 
 <template>
-  <section class="dashboard-page">
-    <div class="section-title">
-      <div>
-        <h2>学生端学习空间</h2>
-        <p>当前学生：{{ auth.username || '未命名' }}（ID: {{ auth.userId }}）</p>
+  <section class="dashboard-page sidebar-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>学生学习空间</h3>
+        <p class="user-info">{{ auth.username || '未命名' }}</p>
       </div>
-      <button class="secondary" @click="logout">退出登录</button>
-    </div>
-    <div v-if="toast.text" :class="['notification', toast.type]">{{ toast.text }}</div>
-    <div class="card">
-      <div class="section-title">
-        <h3>加入班级</h3>
-        <span>已加入 {{ state.joinedClasses.length }} 个班级</span>
-      </div>
-      <form class="form-grid" @submit.prevent="joinClass">
-        <label>
-          邀请码
-          <input v-model="joinForm.code" placeholder="输入教师提供的邀请码" />
-        </label>
-        <div style="display: flex; align-items: flex-end;">
-          <button class="primary" type="submit">加入班级</button>
-        </div>
-      </form>
-      <div class="tab-bar" style="margin-top: 1rem;">
-        <button
-          v-for="cls in state.joinedClasses"
-          :key="cls.id"
-          :class="{ active: state.currentClassId === cls.id }"
-          @click="state.currentClassId = cls.id"
-        >
-          {{ cls.name }}
+      <nav class="sidebar-nav">
+        <button 
+          @click="switchPage('classes')" 
+          :class="['nav-item', { active: currentPage === 'classes' }]">
+          我的班级
         </button>
-        <p v-if="!state.joinedClasses.length" style="color: #94a3b8;">还未加入任何班级，先输入邀请码吧。</p>
+        <button 
+          @click="switchPage('courses')" 
+          :class="['nav-item', { active: currentPage === 'courses' }]">
+          课程信息
+        </button>
+        <button 
+          @click="switchPage('assignments')" 
+          :class="['nav-item', { active: currentPage === 'assignments' }]">
+          作业提交
+        </button>
+        <button 
+          @click="switchPage('profile')" 
+          :class="['nav-item', { active: currentPage === 'profile' }]">
+          个人信息
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="secondary" @click="logout" style="width: 100%;">退出登录</button>
       </div>
-    </div>
+    </aside>
 
-    <div class="card">
+    <main class="main-content">
       <div class="section-title">
-        <h3>课程信息</h3>
-        <span v-if="state.currentClassId">当前班级 ID: {{ state.currentClassId }}</span>
+        <div>
+          <h2>{{ pageTitle }}</h2>
+          <p>{{ pageSubtitle }}</p>
+        </div>
       </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>课程</th>
-              <th>描述</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="course in state.courses" :key="course.id">
-              <td>{{ course.title }}</td>
-              <td>{{ course.description }}</td>
-              <td>
-                <button class="secondary" @click="state.currentCourseId = course.id" :disabled="state.currentCourseId === course.id">
-                  {{ state.currentCourseId === course.id ? '正在学习' : '选中' }}
-                </button>
-              </td>
-            </tr>
-            <tr v-if="!state.courses.length">
-              <td colspan="3">暂无课程，请联系教师创建</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="section-title">
-        <h3>作业与提交</h3>
-        <span v-if="state.currentCourseId">当前课程 ID: {{ state.currentCourseId }}</span>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>作业</th>
-              <th>截止时间</th>
-              <th>说明</th>
-              <th>状态</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="asn in state.assignments"
-              :key="asn.id"
-              @click="loadMySubmission(asn.id)"
-              :style="{
-                cursor: 'pointer',
-                background: state.currentAssignmentId === asn.id ? '#eef2ff' : 'transparent',
-              }"
+      <div v-if="toast.text" :class="['notification', toast.type]">{{ toast.text }}</div>
+
+      <div v-if="currentPage === 'classes'" class="page-content">
+        <div class="card">
+          <div class="section-title">
+            <h3>加入新班级</h3>
+          </div>
+          <form class="form-grid" @submit.prevent="joinClass">
+            <label>
+              邀请码
+              <input v-model="joinForm.code" placeholder="输入教师提供的邀请码" />
+            </label>
+            <div style="display: flex; align-items: flex-end;">
+              <button class="primary" type="submit">加入班级</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <h3>已加入的班级</h3>
+            <span>已加入 {{ state.joinedClasses.length }} 个班级</span>
+          </div>
+          <div class="tab-bar">
+            <button
+              v-for="cls in state.joinedClasses"
+              :key="cls.id"
+              :class="{ active: state.currentClassId === cls.id }"
+              @click="state.currentClassId = cls.id"
             >
-              <td>{{ asn.title }}</td>
-              <td>{{ asn.deadline || '-' }}</td>
-              <td>{{ asn.description }}</td>
-              <td>
-                <span class="status-pill" :class="state.mySubmission?.assignmentId === asn.id ? 'success' : 'warning'">
-                  {{ state.mySubmission?.assignmentId === asn.id ? '已加载提交' : '点击加载' }}
-                </span>
-              </td>
-            </tr>
-            <tr v-if="!state.assignments.length">
-              <td colspan="4">暂无作业</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card" style="margin-top: 1rem; background: #f8fafc;">
-        <h4>提交 / 更新当前作业</h4>
-        <div class="form-grid">
-          <label>
-            答案内容
-            <textarea v-model="submissionForm.answerText" placeholder="粘贴答案或作业说明"></textarea>
-          </label>
-          <label>
-            附件链接
-            <input v-model="submissionForm.filePath" placeholder="网盘、Git 仓库等链接" />
-          </label>
+              {{ cls.name }}
+            </button>
+            <p v-if="!state.joinedClasses.length" style="color: #94a3b8;">还未加入任何班级，先输入邀请码吧。</p>
+          </div>
         </div>
-        <button class="primary" style="margin-top: 1rem;" :disabled="loading.submission" @click="submitAssignment()">
-          {{ loading.submission ? '提交中...' : '提交 / 更新' }}
-        </button>
-        <p v-if="state.mySubmission" style="color: #64748b; margin-top: 0.5rem;">
-          上次提交：{{ state.mySubmission.submittedAt || '未知时间' }}，评分 {{ state.mySubmission.score ?? '未评分' }}
-        </p>
       </div>
-    </div>
 
-    <div class="card">
-      <div class="section-title">
-        <h3>个人信息</h3>
-        <span>信息同步服务器，教师端可用于联系</span>
-      </div>
-      <form class="form-grid" @submit.prevent="saveProfileForm">
-        <label>
-          真实姓名
-          <input v-model="state.profile.realName" placeholder="输入真实姓名" />
-        </label>
-        <label>
-          邮箱
-          <input v-model="state.profile.email" type="email" placeholder="用于接收通知" />
-        </label>
-        <label>
-          手机号
-          <input v-model="state.profile.phone" placeholder="选填" />
-        </label>
-        <div style="grid-column: 1 / -1; display:flex; gap:.75rem;">
-          <button class="primary" type="submit">保存信息</button>
-          <button class="secondary" type="button" @click="fetchProfile">重新加载</button>
+      <div v-if="currentPage === 'courses'" class="page-content">
+        <div class="card">
+          <div class="section-title">
+            <h3>课程信息</h3>
+            <span v-if="state.currentClassId">当前班级 ID: {{ state.currentClassId }}</span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>课程</th>
+                  <th>描述</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="course in state.courses" :key="course.id">
+                  <td>{{ course.title }}</td>
+                  <td>{{ course.description }}</td>
+                  <td>
+                    <button class="secondary" @click="state.currentCourseId = course.id" :disabled="state.currentCourseId === course.id">
+                      {{ state.currentCourseId === course.id ? '正在学习' : '选中' }}
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="!state.courses.length">
+                  <td colspan="3">暂无课程，请联系教师创建</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <div v-if="currentPage === 'assignments'" class="page-content">
+        <div class="card">
+          <div class="section-title">
+            <h3>作业列表</h3>
+            <span v-if="state.currentCourseId">当前课程 ID: {{ state.currentCourseId }}</span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>作业</th>
+                  <th>截止时间</th>
+                  <th>说明</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="asn in state.assignments"
+                  :key="asn.id"
+                  @click="loadMySubmission(asn.id)"
+                  :style="{
+                    cursor: 'pointer',
+                    background: state.currentAssignmentId === asn.id ? '#eef2ff' : 'transparent',
+                  }"
+                >
+                  <td>{{ asn.title }}</td>
+                  <td>{{ asn.deadline || '-' }}</td>
+                  <td>{{ asn.description }}</td>
+                  <td>
+                    <span class="status-pill" :class="state.mySubmission?.assignmentId === asn.id ? 'success' : 'warning'">
+                      {{ state.mySubmission?.assignmentId === asn.id ? '已加载提交' : '点击加载' }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="!state.assignments.length">
+                  <td colspan="4">暂无作业</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" style="background: #f8fafc;">
+          <h4>提交 / 更新当前作业</h4>
+          <div class="form-grid">
+            <label>
+              答案内容
+              <textarea v-model="submissionForm.answerText" placeholder="粘贴答案或作业说明"></textarea>
+            </label>
+            <label>
+              附件链接
+              <input v-model="submissionForm.filePath" placeholder="网盘、Git 仓库等链接" />
+            </label>
+          </div>
+          <button class="primary" style="margin-top: 1rem;" :disabled="loading.submission" @click="submitAssignment()">
+            {{ loading.submission ? '提交中...' : '提交 / 更新' }}
+          </button>
+          <p v-if="state.mySubmission" style="color: #64748b; margin-top: 0.5rem;">
+            上次提交：{{ state.mySubmission.submittedAt || '未知时间' }}，评分 {{ state.mySubmission.score ?? '未评分' }}
+          </p>
+        </div>
+      </div>
+
+      <div v-if="currentPage === 'profile'" class="page-content">
+        <div class="card">
+          <div class="section-title">
+            <h3>个人信息</h3>
+            <span>信息同步服务器，教师端可用于联系</span>
+          </div>
+          <form class="form-grid" @submit.prevent="saveProfileForm">
+            <label>
+              真实姓名
+              <input v-model="state.profile.realName" placeholder="输入真实姓名" />
+            </label>
+            <label>
+              邮箱
+              <input v-model="state.profile.email" type="email" placeholder="用于接收通知" />
+            </label>
+            <label>
+              手机号
+              <input v-model="state.profile.phone" placeholder="选填" />
+            </label>
+            <div style="grid-column: 1 / -1; display:flex; gap:.75rem;">
+              <button class="primary" type="submit">保存信息</button>
+              <button class="secondary" type="button" @click="fetchProfile">重新加载</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
   </section>
 </template>
 
 <style scoped>
-/* 保留其他样式 */
+.dashboard-page.sidebar-layout {
+  display: flex;
+  flex-direction: row !important;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  background: #fff;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(15, 23, 42, 0.05);
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+.sidebar-header h3 {
+  margin: 0 0 0.25rem;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+.user-info {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0.75rem;
+  overflow-y: auto;
+}
+
+.nav-item {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.25rem;
+  border: none;
+  background: transparent;
+  color: #475569;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: #f1f5f9;
+  color: #2563eb;
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+}
+
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .sidebar-layout {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .sidebar-nav {
+    display: flex;
+    overflow-x: auto;
+    padding: 0.5rem;
+  }
+  
+  .nav-item {
+    white-space: nowrap;
+    margin-bottom: 0;
+    margin-right: 0.5rem;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+}
 </style>
