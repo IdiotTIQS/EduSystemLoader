@@ -9,6 +9,7 @@ public class Submission {
     private Long assignmentId;
     private Long studentId;
     private String filePath;
+    private String originalFileName;
     private String answerText;
     private LocalDateTime submittedAt;
     private Double score;

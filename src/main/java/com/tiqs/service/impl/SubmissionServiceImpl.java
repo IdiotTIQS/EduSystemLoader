@@ -19,9 +19,9 @@ public class SubmissionServiceImpl implements SubmissionService {
     public Submission findUnique(Long assignmentId,Long studentId){return submissionMapper.findUnique(assignmentId,studentId);}    
     public List<Submission> listByAssignment(Long assignmentId){return submissionMapper.findByAssignment(assignmentId);}    
     @Transactional
-    public Submission updateContent(Long id,String filePath,String answerText){
+    public Submission updateContent(Long id,String filePath,String answerText,String originalFileName){
         Submission s = new Submission();
-        s.setId(id); s.setFilePath(filePath); s.setAnswerText(answerText);
+        s.setId(id); s.setFilePath(filePath); s.setAnswerText(answerText); s.setOriginalFileName(originalFileName);
         submissionMapper.updateContent(s); log.info("更新提交内容成功 submissionId={}", id);
         return s;
     }

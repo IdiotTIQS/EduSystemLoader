@@ -29,7 +29,7 @@ const state = reactive({
 });
 
 const joinForm = reactive({ code: '' });
-const submissionForm = reactive({ answerText: '', filePath: '', selectedFile: null });
+const submissionForm = reactive({ answerText: '', filePath: '', originalFileName: '', selectedFile: null });
 const loading = reactive({ courses: false, assignments: false, submission: false, classMembers: false });
 
 const switchPage = (page) => {
@@ -85,6 +85,7 @@ const handleFileUpload = async (file) => {
     const fileUrl = await uploadApi.uploadFile(file);
     submissionForm.selectedFile = file;
     submissionForm.filePath = fileUrl;
+    submissionForm.originalFileName = file.name; // 保存原始文件名
     showToast('success', `文件上传成功: ${file.name}`);
     return fileUrl;
   } catch (error) {
@@ -182,7 +183,7 @@ const fetchCourses = async () => { if(!state.currentClassId){ state.courses=[]; 
 
 const fetchAssignments = async () => { if(!state.currentCourseId){ state.assignments=[]; state.currentAssignmentId=''; state.mySubmission=null; return; } loading.assignments=true; try { state.assignments = await assignmentApi.listByCourse(state.currentCourseId); state.currentAssignmentId = state.assignments[0]?.id || ''; state.mySubmission=null; if(state.currentAssignmentId){ await loadMySubmission(state.currentAssignmentId); } } catch(e){ showToast('error', e.message || '获取作业失败'); } finally { loading.assignments=false; } };
 
-const loadMySubmission = async (assignmentId) => { if(!assignmentId) return; state.currentAssignmentId=assignmentId; try { state.mySubmission = await submissionApi.findUnique(assignmentId, auth.userId); if(state.mySubmission){ submissionForm.answerText = state.mySubmission.answerText || ''; submissionForm.filePath = state.mySubmission.filePath || ''; } else { submissionForm.answerText=''; submissionForm.filePath=''; } } catch(e){ showToast('error', e.message || '获取作业提交失败'); } };
+const loadMySubmission = async (assignmentId) => { if(!assignmentId) return; state.currentAssignmentId=assignmentId; try { state.mySubmission = await submissionApi.findUnique(assignmentId, auth.userId); if(state.mySubmission){ submissionForm.answerText = state.mySubmission.answerText || ''; submissionForm.filePath = state.mySubmission.filePath || ''; submissionForm.originalFileName = state.mySubmission.originalFileName || ''; } else { submissionForm.answerText=''; submissionForm.filePath=''; submissionForm.originalFileName=''; } } catch(e){ showToast('error', e.message || '获取作业提交失败'); } };
 
 const submitAssignment = async (assignmentId = state.currentAssignmentId) => { 
   if(!assignmentId){ 
@@ -196,15 +197,26 @@ const submitAssignment = async (assignmentId = state.currentAssignmentId) => {
   loading.submission=true; 
   try { 
     if(state.mySubmission){ 
-      await submissionApi.updateContent(state.mySubmission.id,{ answerText: submissionForm.answerText, filePath: submissionForm.filePath }); 
+      await submissionApi.updateContent(state.mySubmission.id,{ 
+        answerText: submissionForm.answerText, 
+        filePath: submissionForm.filePath,
+        originalFileName: submissionForm.originalFileName 
+      }); 
       showToast('success','已更新提交内容'); 
     } else { 
-      await submissionApi.submit({ assignmentId, studentId: auth.userId, answerText: submissionForm.answerText, filePath: submissionForm.filePath }); 
+      await submissionApi.submit({ 
+        assignmentId, 
+        studentId: auth.userId, 
+        answerText: submissionForm.answerText, 
+        filePath: submissionForm.filePath,
+        originalFileName: submissionForm.originalFileName 
+      }); 
       showToast('success','作业提交成功'); 
     } 
     await loadMySubmission(assignmentId); 
     // 重置文件上传区域
     submissionForm.selectedFile = null;
+    submissionForm.originalFileName = '';
   } catch(e){ 
     showToast('error', e.message || '提交失败'); 
   } finally { 
@@ -393,7 +405,7 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             />
           </div>
           <div v-if="submissionForm.filePath" style="margin-top: 1rem; color: #64748b; font-size: 0.9rem;">
-            已上传文件: {{ submissionForm.filePath }}
+            已上传文件: {{ submissionForm.originalFileName || submissionForm.filePath }}
           </div>
           <button class="primary" style="margin-top: 1rem;" :disabled="loading.submission" @click="submitAssignment()">
             {{ loading.submission ? '提交中...' : '提交 / 更新' }}

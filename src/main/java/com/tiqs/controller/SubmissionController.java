@@ -26,7 +26,7 @@ public class SubmissionController {
     public ApiResponse<Submission> findUnique(@RequestParam Long assignmentId,@RequestParam Long studentId){log.debug("查询学生提交 assignmentId={} studentId={}", assignmentId,studentId); return ApiResponse.ok(submissionService.findUnique(assignmentId,studentId));}
     @RequireRole(UserRole.STUDENT)
     @PutMapping("/{id}")
-    public ApiResponse<Submission> updateContent(@PathVariable Long id,@RequestBody Submission s){log.info("更新作业提交 id={}", id); return ApiResponse.ok(submissionService.updateContent(id,s.getFilePath(),s.getAnswerText()));}
+    public ApiResponse<Submission> updateContent(@PathVariable Long id,@RequestBody Submission s){log.info("更新作业提交 id={}", id); return ApiResponse.ok(submissionService.updateContent(id,s.getFilePath(),s.getAnswerText(),s.getOriginalFileName()));}
     @RequireRole(UserRole.TEACHER)
     @PutMapping("/{id}/grade")
     public ApiResponse<Submission> grade(@PathVariable Long id,@RequestParam Double score,@RequestParam(required=false) String feedback){log.info("教师评分 submissionId={} score={}", id,score); return ApiResponse.ok(submissionService.grade(id,score,feedback));}

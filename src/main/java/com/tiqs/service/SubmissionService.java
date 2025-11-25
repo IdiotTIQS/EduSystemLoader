@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface SubmissionService {
     Submission submit(Submission s);
-    Submission updateContent(Long id,String filePath,String answerText);
+    Submission updateContent(Long id,String filePath,String answerText,String originalFileName);
     Submission grade(Long id,Double score,String feedback);
     Submission findUnique(Long assignmentId,Long studentId);
     List<Submission> listByAssignment(Long assignmentId);
