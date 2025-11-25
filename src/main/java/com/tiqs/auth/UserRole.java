@@ -10,6 +10,6 @@ public enum UserRole {
                 return role;
             }
         }
-        throw new AuthException("未知角色: " + value);
+        throw new AuthException("未知角色:  " + value);
     }
 }
