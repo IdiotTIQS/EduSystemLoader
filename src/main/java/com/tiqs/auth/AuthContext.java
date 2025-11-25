@@ -7,5 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AuthContext {
     private final Long userId;
+    private final String username;
     private final UserRole role;
 }

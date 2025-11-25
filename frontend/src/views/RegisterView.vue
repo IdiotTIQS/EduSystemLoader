@@ -38,7 +38,12 @@ const handleRegister = async () => {
       email: form.email,
       phone: form.phone,
     });
-    setAuth({ username: data.username, userId: data.userId, role: data.role });
+    setAuth({ 
+      username: data.username, 
+      userId: data.userId, 
+      role: data.role,
+      token: data.token 
+    });
     notification.type = 'success';
     notification.text = '注册成功，已自动登录';
     router.push(data.role === 'TEACHER' ? '/teacher' : '/student');

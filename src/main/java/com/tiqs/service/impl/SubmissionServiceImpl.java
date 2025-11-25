@@ -10,6 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class SubmissionServiceImpl implements SubmissionService {
     private final SubmissionMapper submissionMapper;
     public SubmissionServiceImpl(SubmissionMapper submissionMapper){this.submissionMapper=submissionMapper;}

@@ -1,30 +1,31 @@
 const AUTH_KEY = 'edu-auth';
 const STUDENT_CLASSES_KEY = 'edu-student-classes';
 
-export function getAuth() {
-  try {
-    return JSON.parse(localStorage.getItem(AUTH_KEY)) || {};
-  } catch (error) {
-    return {};
-  }
-}
+export const getAuth = () => {
+  return JSON.parse(localStorage.getItem(AUTH_KEY)) || {};
+};
 
-export function setAuth(payload) {
+export const setAuth = (payload) => {
   localStorage.setItem(AUTH_KEY, JSON.stringify(payload));
-}
+};
 
-export function clearAuth() {
+export const clearAuth = () => {
   localStorage.removeItem(AUTH_KEY);
-}
+};
 
-export function getStudentClasses() {
-  try {
-    return JSON.parse(localStorage.getItem(STUDENT_CLASSES_KEY)) || [];
-  } catch (error) {
-    return [];
-  }
-}
+export const getStudentClasses = () => {
+  return JSON.parse(localStorage.getItem(STUDENT_CLASSES_KEY)) || [];
+};
 
-export function saveStudentClasses(classes) {
+export const setStudentClasses = (classes) => {
   localStorage.setItem(STUDENT_CLASSES_KEY, JSON.stringify(classes));
-}
+};
+
+export const getToken = () => {
+  const auth = getAuth();
+  return auth.token;
+};
+
+export const saveStudentClasses = (classes) => {
+  setStudentClasses(classes);
+};

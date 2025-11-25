@@ -11,6 +11,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class ClassServiceImpl implements ClassService {
     private final ClassMapper classMapper;
     public ClassServiceImpl(ClassMapper classMapper){this.classMapper=classMapper;}

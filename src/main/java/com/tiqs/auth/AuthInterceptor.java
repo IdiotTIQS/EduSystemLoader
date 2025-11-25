@@ -2,6 +2,7 @@ package com.tiqs.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -11,10 +12,11 @@ import java.util.Arrays;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class AuthInterceptor implements HandlerInterceptor {
-    private static final String HEADER_USER_ID = "X-User-Id";
-    private static final String HEADER_USER_ROLE = "X-User-Role";
+    private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final Set<String> WHITE_LIST = Set.of("/api/auth/login", "/api/auth/register");
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -25,19 +27,24 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (WHITE_LIST.contains(path)) {
             return true;
         }
-        String userIdHeader = request.getHeader(HEADER_USER_ID);
-        String roleHeader = request.getHeader(HEADER_USER_ROLE);
-        if (!StringUtils.hasText(userIdHeader) || !StringUtils.hasText(roleHeader)) {
-            throw new AuthException("缺少鉴权头: X-User-Id / X-User-Role");
+        
+        String authHeader = request.getHeader(HEADER_AUTHORIZATION);
+        if (!StringUtils.hasText(authHeader)) {
+            throw new AuthException("缺少认证头: Authorization");
         }
-        Long userId = parseUserId(userIdHeader);
-        UserRole role = UserRole.from(roleHeader);
-        AuthContextHolder.set(new AuthContext(userId, role));
+        
+        String token = jwtTokenProvider.extractTokenFromBearer(authHeader);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            throw new AuthException("无效的认证令牌");
+        }
+        
+        AuthContext authContext = jwtTokenProvider.getAuthContextFromToken(token);
+        AuthContextHolder.set(authContext);
 
         if (handler instanceof HandlerMethod handlerMethod) {
             RequireRole requireRole = resolveAnnotation(handlerMethod);
             if (requireRole != null && requireRole.value().length > 0) {
-                boolean allowed = Arrays.stream(requireRole.value()).anyMatch(r -> r == role);
+                boolean allowed = Arrays.stream(requireRole.value()).anyMatch(r -> r == authContext.getRole());
                 if (!allowed) {
                     throw new AuthException("当前角色无权访问该接口");
                 }
@@ -51,13 +58,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         AuthContextHolder.clear();
     }
 
-    private Long parseUserId(String headerValue) {
-        try {
-            return Long.parseLong(headerValue);
-        } catch (NumberFormatException ex) {
-            throw new AuthException("X-User-Id 必须为数字");
-        }
-    }
+    
 
     private RequireRole resolveAnnotation(HandlerMethod handlerMethod) {
         RequireRole method = handlerMethod.getMethodAnnotation(RequireRole.class);

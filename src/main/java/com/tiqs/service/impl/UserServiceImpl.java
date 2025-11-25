@@ -1,6 +1,8 @@
 package com.tiqs.service.impl;
 
+import com.tiqs.auth.AuthContext;
 import com.tiqs.auth.AuthException;
+import com.tiqs.auth.JwtTokenProvider;
 import com.tiqs.auth.UserRole;
 import com.tiqs.dto.AuthRequest;
 import com.tiqs.dto.AuthResponse;
@@ -14,16 +16,20 @@ import com.tiqs.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         validateRegisterRequest(request);
         if (userMapper.findByUsername(request.getUsername()) != null) {
@@ -74,6 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserProfile updateProfile(Long userId, ProfileRequest request) {
         User user = userMapper.findById(userId);
         if (user == null) {
@@ -98,6 +105,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private AuthResponse buildResponse(User user, UserProfile profile) {
+        AuthContext authContext = new AuthContext(
+                user.getId(),
+                user.getUsername(),
+                UserRole.valueOf(user.getRole())
+        );
+        String token = jwtTokenProvider.generateToken(authContext);
+        
         return AuthResponse.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -105,6 +119,7 @@ public class UserServiceImpl implements UserService {
                 .realName(profile != null ? profile.getRealName() : null)
                 .email(profile != null ? profile.getEmail() : null)
                 .phone(profile != null ? profile.getPhone() : null)
+                .token(token)
                 .build();
     }
 }

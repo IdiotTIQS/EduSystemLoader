@@ -5,15 +5,32 @@
 |[/api/classes](#classes)| 班级资源 | 
 |[/api/courses](#courses)| 课程资源 | 
 |[/api/enrollments](#enrollments)| 班级成员 | 
-|[/api/submissions](#submissions)| 作业提交与评分 | 
+|[/api/submissions](#submissions)| 作业提交与评分 |
+|[/api/upload](#upload)| 文件上传 | 
 
 ***
 ## 错误码列表
-| 错误码 | 说明 |
-|------ |----- |
-| 0 | 正确 |
-| 1 | 业务错误 |
-| 2 | 参数错误 |
+| 错误码 | 说明 | HTTP状态码 |
+|------ |----- |-----------|
+| 0 | 成功 | 200 |
+| 1 | 业务错误 | 200 |
+| 2 | 参数错误 | 400 |
+| 400 | 参数验证失败 | 400 |
+| 401 | 认证失败/未登录 | 401 |
+| 403 | 权限不足 | 403 |
+| 404 | 资源不存在 | 404 |
+| 405 | HTTP方法不支持 | 405 |
+| 409 | 数据冲突/重复 | 409 |
+| 413 | 文件大小超出限制 | 413 |
+| 500 | 服务器内部错误 | 500 |
+
+### 常见错误场景
+- **400**: 参数格式错误、缺少必需参数、验证失败
+- **401**: JWT令牌无效、过期、未携带
+- **403**: 角色权限不足访问该接口
+- **409**: 用户名已存在、邮箱重复注册
+- **413**: 上传文件超过100MB限制
+- **500**: 数据库连接失败、系统异常 |
 
 统一返回结构：
 | 名称 | 类型 | 说明 |
@@ -22,10 +39,95 @@
 | message | string | 信息 |
 | data | object | 具体数据 |
 
+### 数据类型说明
+#### UserProfile
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| userId | Long | 用户ID |
+| realName | String | 真实姓名 |
+| email | String | 邮箱地址 |
+| phone | String | 手机号码 |
+
+#### Assignment
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 作业ID |
+| courseId | Long | 课程ID |
+| title | String | 作业标题 |
+| description | String | 作业描述 |
+| deadline | LocalDateTime | 截止时间 |
+| createdAt | LocalDateTime | 创建时间 |
+
+#### ClassEntity
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 班级ID |
+| name | String | 班级名称 |
+| code | String | 邀请码 |
+| teacherId | Long | 教师ID |
+| createdAt | LocalDateTime | 创建时间 |
+
+#### Course
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 课程ID |
+| title | String | 课程标题 |
+| description | String | 课程描述 |
+| classId | Long | 班级ID |
+| teacherId | Long | 教师ID |
+| createdAt | LocalDateTime | 创建时间 |
+
+#### Enrollment
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 记录ID |
+| classId | Long | 班级ID |
+| studentId | Long | 学生ID |
+| joinedAt | LocalDateTime | 加入时间 |
+
+#### Submission
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 提交ID |
+| assignmentId | Long | 作业ID |
+| studentId | Long | 学生ID |
+| filePath | String | 文件路径 |
+| answerText | String | 文本答案 |
+| submittedAt | LocalDateTime | 提交时间 |
+| score | Double | 得分 |
+| feedback | String | 反馈 |
+| gradedAt | LocalDateTime | 评分时间 |
+| status | String | 状态 |
+
 ## 鉴权说明
+
+### JWT令牌认证
 所有 `/api/**` 接口必须携带以下请求头：
-- `X-User-Id`：当前用户ID (Long)
-- `X-User-Role`：`TEACHER` 或 `STUDENT`
+- `Authorization`：`Bearer {JWT_TOKEN}` 格式的认证令牌
+
+### JWT令牌说明
+- **获取方式**: 通过登录或注册接口获取
+- **有效期**: 7天 (604800000毫秒)
+- **格式**: `Bearer eyJhbGciOiJIUzI1NiJ9...`
+- **存储位置**: 前端localStorage
+- **自动续期**: 令牌过期后需要重新登录
+
+### 令牌payload结构
+```json
+{
+  "sub": "1",           // 用户ID
+  "role": "TEACHER",    // 用户角色
+  "username": "teacher001", // 用户名
+  "iat": 1700800000,    // 签发时间
+  "exp": 1701404800     // 过期时间
+}
+```
+
+### 令牌使用注意事项
+1. **安全存储**: 建议使用httpOnly cookie或安全的localStorage
+2. **传输安全**: 生产环境必须使用HTTPS
+3. **过期处理**: 前端需处理401错误并跳转登录
+4. **令牌撤销**: 目前不支持主动撤销，依赖过期机制
 
 权限概览：
 - **教师角色**：允许访问/操作 `POST|PUT|DELETE /api/assignments/**`、`POST|PUT|DELETE /api/classes/**`、`GET /api/classes/teacher/{teacherId}`、`POST|PUT|DELETE /api/courses/**`、`GET /api/enrollments/class/{classId}`、`GET /api/submissions`、`PUT /api/submissions/{id}/grade`。
@@ -37,12 +139,134 @@
 ### 认证接口
 | 方法 | 路径 | 说明 | 请求体 | 返回 data |
 |------|------|------|--------|-----------|
-| POST | /api/auth/register | 用户注册（教师/学生） | `{username,password,role,realName?,email?,phone?}` | `{userId,username,role,realName,email,phone}` |
-| POST | /api/auth/login | 用户登录 | `{username,password}` | `{userId,username,role,realName,email,phone}` |
+| POST | /api/auth/register | 用户注册（教师/学生） | `{username,password,role,realName?,email?,phone?}` | `{userId,username,role,realName,email,phone,token}` |
+| POST | /api/auth/login | 用户登录 | `{username,password}` | `{userId,username,role,realName,email,phone,token}` |
 | GET | /api/users/profile | 获取当前用户资料 | - | `UserProfile{userId,realName,email,phone}` |
+| GET | /api/users/{userId}/profile | 获取指定用户资料 | userId(Path,Long) | - | `UserProfile{userId,realName,email,phone}` |
 | PUT | /api/users/profile | 更新用户资料 | `{realName?,email?,phone?}` | `UserProfile` |
 
 > `/api/auth/**` 接口无需携带鉴权头，其余接口保持原有策略。
+
+## 请求/响应示例
+
+### 成功响应示例
+```json
+{
+  "code": 0,
+  "message": "操作成功",
+  "data": {
+    "userId": 1,
+    "username": "teacher001",
+    "role": "TEACHER",
+    "realName": "张老师",
+    "email": "teacher@example.com",
+    "phone": "13800138000",
+    "token": "eyJhbGciOiJIUzI1NiJ9..."
+  }
+}
+```
+
+### 错误响应示例
+```json
+{
+  "code": 401,
+  "message": "认证失败：无效的认证令牌",
+  "data": null
+}
+```
+
+### 认证接口示例
+
+#### 用户登录
+**请求:**
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "teacher001",
+  "password": "password123"
+}
+```
+
+**响应:**
+```json
+{
+  "code": 0,
+  "message": "操作成功",
+  "data": {
+    "userId": 1,
+    "username": "teacher001",
+    "role": "TEACHER",
+    "realName": "张老师",
+    "email": "teacher@example.com",
+    "phone": "13800138000",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwicm9sZSI6IlRFQUNIRVIiLCJ1c2VybmFtZSI6InRlYWNoZXIwMDEiLCJpYXQiOjE3MDA4MDAwMDAsImV4cCI6MTcwMTQwNDgwMH0.signature"
+  }
+}
+```
+
+#### 创建班级
+**请求:**
+```bash
+POST /api/classes
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+{
+  "name": "计算机科学2024级",
+  "teacherId": 1,
+  "code": "CS2024"
+}
+```
+
+**响应:**
+```json
+{
+  "code": 0,
+  "message": "操作成功",
+  "data": {
+    "id": 1,
+    "name": "计算机科学2024级",
+    "code": "CS2024",
+    "teacherId": 1,
+    "createdAt": "2024-11-25T12:00:00"
+  }
+}
+```
+
+### 文件上传示例
+**请求:**
+```bash
+POST /api/upload/file
+Content-Type: multipart/form-data
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+file: [binary data]
+```
+
+**响应:**
+```json
+{
+  "code": 0,
+  "message": "操作成功",
+  "data": "/uploads/2024/11/25/abc123-def456-ghi789.pdf"
+}
+```
+
+---
+
+### 开发环境配置
+- **后端地址**: http://localhost:8080
+- **前端地址**: http://localhost:5173
+- **数据库**: MySQL (tiqs1337.icu:3306)
+- **文件上传**: 本地存储在 `/uploads/` 目录
+
+### 测试账号
+- **教师账号**: teacher001 / password123
+- **学生账号**: student001 / password123
+
+---
 
 ## 接口详情
 
@@ -53,12 +277,16 @@
         | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
         |-----|------|------|---------|----------|-------------|
         | POST | /api/assignments | 创建作业 | - | JSON Assignment{courseId,title,description,deadline} | Assignment |
+        | GET | /api/assignments/{id} | 作业详情 | id(Path,Long) | - | Assignment |
+        | GET | /api/assignments | 按课程列出 | courseId(Query,Long) | - | Assignment[] |
+        | PUT | /api/assignments/{id} | 更新作业 | id(Path,Long) | JSON Assignment{title,description,deadline} | Assignment |
+        | DELETE | /api/assignments/{id} | 删除作业 | id(Path,Long) | - | null |
         | GET | /api/assignments/{id} | 作业详情 | id(Path) | - | Assignment |
         | GET | /api/assignments | 按课程列出 | courseId(Query,Long) | - | Assignment[] |
         | PUT | /api/assignments/{id} | 更新作业 | id(Path) | JSON Assignment(可更新字段) | Assignment |
         | DELETE | /api/assignments/{id} | 删除作业 | id(Path) | - | null |
 
-    * Assignment字段：id,courseId,title,description,deadline,createdAt
+    * 请求参数类型：Assignment{courseId(Long),title(String),description(String),deadline(LocalDateTime)}
 
 ---
 * <span id="classes">班级接口</span>
@@ -68,13 +296,13 @@
         | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
         |-----|------|------|---------|----------|-------------|
         | POST | /api/classes | 创建班级 | - | JSON ClassEntity{name,teacherId,code} | ClassEntity |
-        | GET | /api/classes/{id} | 班级详情 | id(Path) | - | ClassEntity |
-        | GET | /api/classes/teacher/{teacherId} | 教师班级列表 | teacherId(Path) | - | ClassEntity[] |
-        | PUT | /api/classes/{id} | 更新名称 | id(Path), name(Query) | - | ClassEntity |
-        | DELETE | /api/classes/{id} | 删除班级 | id(Path) | - | null |
-        | GET | /api/classes/code/{code} | 邀请码查找 | code(Path) | - | ClassEntity |
+        | GET | /api/classes/{id} | 班级详情 | id(Path,Long) | - | ClassEntity |
+        | GET | /api/classes/teacher/{teacherId} | 教师班级列表 | teacherId(Path,Long) | - | ClassEntity[] |
+        | PUT | /api/classes/{id} | 更新名称 | id(Path,Long), name(Query,String) | - | ClassEntity |
+        | DELETE | /api/classes/{id} | 删除班级 | id(Path,Long) | - | null |
+        | GET | /api/classes/code/{code} | 邀请码查找 | code(Path,String) | - | ClassEntity |
 
-    * ClassEntity字段：id,name,code,teacherId,createdAt
+    * 请求参数类型：ClassEntity{name(String),teacherId(Long),code(String)}
 
 ---
 * <span id="courses">课程接口</span>
@@ -83,12 +311,12 @@
         | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
         |-----|------|------|---------|----------|-------------|
         | POST | /api/courses | 创建课程 | - | JSON Course{classId,title,description,teacherId} | Course |
-        | GET | /api/courses/{id} | 课程详情 | id(Path) | - | Course |
+        | GET | /api/courses/{id} | 课程详情 | id(Path,Long) | - | Course |
         | GET | /api/courses | 班级课程列表 | classId(Query,Long) | - | Course[] |
-        | PUT | /api/courses/{id} | 更新课程 | id(Path) | JSON Course{title,description} | Course |
-        | DELETE | /api/courses/{id} | 删除课程 | id(Path) | - | null |
+        | PUT | /api/courses/{id} | 更新课程 | id(Path,Long) | JSON Course{title,description} | Course |
+        | DELETE | /api/courses/{id} | 删除课程 | id(Path,Long) | - | null |
 
-    * Course字段：id,title,description,classId,teacherId,createdAt
+    * 请求参数类型：Course{classId(Long),title(String),description(String),teacherId(Long)}
 
 ---
 * <span id="enrollments">班级成员接口</span>
@@ -97,10 +325,10 @@
         | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
         |-----|------|------|---------|----------|-------------|
         | POST | /api/enrollments | 学生加入 | classId(Query,Long),studentId(Query,Long) | - | Enrollment |
-        | GET | /api/enrollments/class/{classId} | 班级成员列表 | classId(Path) | - | Enrollment[] |
+        | GET | /api/enrollments/class/{classId} | 班级成员列表 | classId(Path,Long) | - | Enrollment[] |
         | GET | /api/enrollments/unique | 唯一记录查询 | classId(Query,Long),studentId(Query,Long) | - | Enrollment/null |
 
-    * Enrollment字段：id,classId,studentId,joinedAt
+    * 请求参数类型：Enrollment{classId(Long),studentId(Long)}
 
 ---
 * <span id="submissions">作业提交接口</span>
@@ -111,9 +339,27 @@
         | POST | /api/submissions | 提交作业 | - | JSON Submission{assignmentId,studentId,filePath,answerText} | Submission |
         | GET | /api/submissions | 作业提交列表 | assignmentId(Query,Long) | - | Submission[] |
         | GET | /api/submissions/unique | 学生唯一提交 | assignmentId(Query,Long),studentId(Query,Long) | - | Submission/null |
-        | PUT | /api/submissions/{id} | 更新内容 | id(Path) | JSON Submission{filePath,answerText} | Submission |
-        | PUT | /api/submissions/{id}/grade | 教师评分 | id(Path), score(Query,Double), feedback(Query,可选) | - | Submission |
+        | PUT | /api/submissions/{id} | 更新内容 | id(Path,Long) | JSON Submission{filePath,answerText} | Submission |
+        | PUT | /api/submissions/{id}/grade | 教师评分 | id(Path,Long), score(Query,Double), feedback(Query,String,可选) | - | Submission |
 
-    * Submission字段：id,assignmentId,studentId,filePath,answerText,submittedAt,score,feedback,gradedAt,status
+    * 请求参数类型：Submission{assignmentId(Long),studentId(Long),filePath(String),answerText(String)}
+
+---
+* <span id="upload">文件上传接口</span>
+    * 根路径：/api/upload
+    * 方法列表：
+        | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
+        |-----|------|------|---------|----------|-------------|
+        | POST | /api/upload/file | 上传文件 | file(FormData,MultipartFile) | - | String(文件URL) |
+
+    * 文件上传说明：
+        - 支持所有文件类型（除可执行文件和脚本文件）
+        - 文件大小限制：100MB
+        - 禁止上传的文件类型：.exe, .bat, .sh, .cmd, .com, .scr, .msi, .sql, .ddl, .dml, .pl, .php, .asp, .jsp, .js, .vbs, .py, .rb, .ps1, .bash, .zsh
+        - 文件按日期存储：/uploads/yyyy/MM/dd/
+        - 返回格式：/uploads/yyyy/MM/dd/UUID.扩展名
+        - 需要鉴权：所有用户角色均可上传文件
+
+---
 
 ---

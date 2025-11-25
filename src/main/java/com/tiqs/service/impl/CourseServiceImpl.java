@@ -10,6 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class CourseServiceImpl implements CourseService {
     private final CourseMapper courseMapper;
     public CourseServiceImpl(CourseMapper courseMapper){this.courseMapper=courseMapper;}

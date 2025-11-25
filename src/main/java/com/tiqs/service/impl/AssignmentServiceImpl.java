@@ -10,6 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class AssignmentServiceImpl implements AssignmentService {
     private final AssignmentMapper assignmentMapper;
     public AssignmentServiceImpl(AssignmentMapper assignmentMapper){this.assignmentMapper=assignmentMapper;}

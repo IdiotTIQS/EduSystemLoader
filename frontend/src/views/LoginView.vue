@@ -22,7 +22,12 @@ const handleLogin = async () => {
   loading.value = true;
   try {
     const data = await authApi.login(form);
-    setAuth({ userId: data.userId, role: data.role, username: data.username });
+    setAuth({ 
+      userId: data.userId, 
+      role: data.role, 
+      username: data.username,
+      token: data.token 
+    });
     notification.type = 'success';
     notification.text = '登录成功';
     const redirect = route.query.redirect;

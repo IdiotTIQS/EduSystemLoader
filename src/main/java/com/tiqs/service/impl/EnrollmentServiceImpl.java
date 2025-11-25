@@ -10,6 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentMapper enrollmentMapper;
     public EnrollmentServiceImpl(EnrollmentMapper enrollmentMapper){this.enrollmentMapper=enrollmentMapper;}

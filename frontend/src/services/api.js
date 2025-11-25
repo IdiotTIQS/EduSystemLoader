@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAuth } from './auth';
+import { getToken, clearAuth } from './auth';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
@@ -7,12 +7,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const auth = getAuth();
-  if (auth?.userId) {
-    config.headers['X-User-Id'] = auth.userId;
-  }
-  if (auth?.role) {
-    config.headers['X-User-Role'] = auth.role;
+  const token = getToken();
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
   return config;
 });
@@ -28,7 +25,13 @@ api.interceptors.response.use(
     }
     return payload;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    if (error.response?.status === 401) {
+      clearAuth();
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
 );
 
 export const authApi = {
