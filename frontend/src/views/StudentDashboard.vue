@@ -1,8 +1,9 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { assignmentApi, authApi, classApi, courseApi, enrollmentApi, submissionApi } from '../services/api';
+import { assignmentApi, authApi, classApi, courseApi, enrollmentApi, submissionApi, uploadApi } from '../services/api';
 import { clearAuth, getAuth, getStudentClasses, saveStudentClasses } from '../services/auth';
+import FileUpload from '../components/FileUpload.vue';
 
 const router = useRouter();
 const auth = getAuth();
@@ -15,20 +16,143 @@ const showToast = (type, text) => { toast.type = type; toast.text = text; setTim
 
 const emptyProfile = { realName: '', email: '', phone: '' };
 const state = reactive({
-  joinedClasses: getStudentClasses(), currentClassId: '', courses: [], currentCourseId: '', assignments: [], currentAssignmentId: '', mySubmission: null, profile: { ...emptyProfile }
+  joinedClasses: getStudentClasses(), 
+  currentClassId: '', 
+  courses: [], 
+  currentCourseId: '', 
+  assignments: [], 
+  currentAssignmentId: '', 
+  mySubmission: null, 
+  profile: { ...emptyProfile },
+  classMembers: [],
+  currentClassForMembers: null
 });
 
 const joinForm = reactive({ code: '' });
-const submissionForm = reactive({ answerText: '', filePath: '' });
-const loading = reactive({ courses: false, assignments: false, submission: false });
+const submissionForm = reactive({ answerText: '', filePath: '', selectedFile: null });
+const loading = reactive({ courses: false, assignments: false, submission: false, classMembers: false });
 
 const switchPage = (page) => {
   currentPage.value = page;
 };
 
+const fetchClassMembers = async (classId) => {
+  if (!classId) {
+    state.classMembers = [];
+    return;
+  }
+  loading.classMembers = true;
+  try {
+    const enrollments = await enrollmentApi.listByClass(classId);
+    const membersWithDetails = await Promise.all(
+      enrollments.map(async (enrollment) => {
+        try {
+          const profile = await authApi.getUserProfile(enrollment.studentId);
+          return {
+            ...enrollment,
+            realName: profile.realName,
+            email: profile.email,
+            phone: profile.phone
+          };
+        } catch (error) {
+          return {
+            ...enrollment,
+            realName: null,
+            email: null,
+            phone: null
+          };
+        }
+      })
+    );
+    state.classMembers = membersWithDetails;
+  } catch (e) {
+    showToast('error', e.message || '获取班级成员失败');
+  } finally {
+    loading.classMembers = false;
+  }
+};
+
+const handleFileUpload = async (file) => {
+  // 客户端预先检查文件大小
+  const maxSize = 100 * 1024 * 1024; // 100MB
+  if (file.size > maxSize) {
+    showToast('error', '文件大小超出限制，请选择小于100MB的文件');
+    throw new Error('文件大小超出限制');
+  }
+  
+  try {
+    loading.submission = true;
+    const fileUrl = await uploadApi.uploadFile(file);
+    submissionForm.selectedFile = file;
+    submissionForm.filePath = fileUrl;
+    showToast('success', `文件上传成功: ${file.name}`);
+    return fileUrl;
+  } catch (error) {
+    let errorMessage = '文件上传失败';
+    
+    // 根据错误类型提供具体的错误信息
+    if (error.response) {
+      const status = error.response.status;
+      if (status === 413) {
+        errorMessage = '文件大小超出限制，请选择小于100MB的文件';
+      } else if (status === 400) {
+        errorMessage = error.response.data?.message || '文件格式不支持或文件损坏';
+      } else if (status === 401) {
+        errorMessage = '登录已失效，请重新登录';
+      } else if (status === 429) {
+        errorMessage = '上传过于频繁，请稍后再试';
+      }
+    } else if (error.message) {
+      if (error.message.includes('Network Error') || error.message.includes('Request failed with status code 413')) {
+        errorMessage = '文件大小超出限制，请选择小于100MB的文件';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = '上传超时，请检查网络连接或文件大小';
+      } else if (error.message.includes('文件大小超出限制')) {
+        errorMessage = '文件大小超出限制，请选择小于100MB的文件';
+      }
+    }
+    
+    showToast('error', errorMessage);
+    throw error;
+  } finally {
+    loading.submission = false;
+  }
+};
+
+const handleFileUploadError = (error) => {
+  let errorMessage = '文件上传失败';
+  
+  if (error.response) {
+    const status = error.response.status;
+    if (status === 413) {
+      errorMessage = '文件大小超出限制，请选择小于100MB的文件';
+    } else if (status === 400) {
+      errorMessage = error.response.data?.message || '文件格式不支持或文件损坏';
+    } else if (status === 401) {
+      errorMessage = '登录已失效，请重新登录';
+    }
+  } else if (error.message) {
+    if (error.message.includes('Network Error')) {
+      errorMessage = '网络连接失败，请检查网络后重试';
+    }
+  }
+  
+  showToast('error', errorMessage);
+  submissionForm.selectedFile = null;
+  submissionForm.filePath = '';
+};
+
+const viewClassMembers = (classId) => {
+  state.currentClassForMembers = state.joinedClasses.find(c => c.id === classId);
+  state.currentClassId = classId;
+  fetchClassMembers(classId);
+  switchPage('class-members');
+};
+
 const pageTitle = computed(() => {
   const titles = {
     classes: '我的班级',
+    'class-members': '班级成员',
     courses: '课程信息',
     assignments: '作业提交',
     profile: '个人信息'
@@ -39,6 +163,7 @@ const pageTitle = computed(() => {
 const pageSubtitle = computed(() => {
   const subtitles = {
     classes: '加入班级并查看班级信息',
+    'class-members': '查看班级成员列表',
     courses: '查看已加入班级的课程',
     assignments: '查看和提交作业',
     profile: '管理个人信息和联系方式'
@@ -59,7 +184,33 @@ const fetchAssignments = async () => { if(!state.currentCourseId){ state.assignm
 
 const loadMySubmission = async (assignmentId) => { if(!assignmentId) return; state.currentAssignmentId=assignmentId; try { state.mySubmission = await submissionApi.findUnique(assignmentId, auth.userId); if(state.mySubmission){ submissionForm.answerText = state.mySubmission.answerText || ''; submissionForm.filePath = state.mySubmission.filePath || ''; } else { submissionForm.answerText=''; submissionForm.filePath=''; } } catch(e){ showToast('error', e.message || '获取作业提交失败'); } };
 
-const submitAssignment = async (assignmentId = state.currentAssignmentId) => { if(!assignmentId){ showToast('warning','请选择作业'); return; } if(!submissionForm.answerText && !submissionForm.filePath){ showToast('warning','请输入答案或上传链接'); return; } loading.submission=true; try { if(state.mySubmission){ await submissionApi.updateContent(state.mySubmission.id,{ answerText: submissionForm.answerText, filePath: submissionForm.filePath }); showToast('success','已更新提交内容'); } else { await submissionApi.submit({ assignmentId, studentId: auth.userId, answerText: submissionForm.answerText, filePath: submissionForm.filePath }); showToast('success','作业提交成功'); } await loadMySubmission(assignmentId); } catch(e){ showToast('error', e.message || '提交失败'); } finally { loading.submission=false; } };
+const submitAssignment = async (assignmentId = state.currentAssignmentId) => { 
+  if(!assignmentId){ 
+    showToast('warning','请选择作业'); 
+    return; 
+  } 
+  if(!submissionForm.answerText && !submissionForm.filePath){ 
+    showToast('warning','请输入答案或上传附件'); 
+    return; 
+  } 
+  loading.submission=true; 
+  try { 
+    if(state.mySubmission){ 
+      await submissionApi.updateContent(state.mySubmission.id,{ answerText: submissionForm.answerText, filePath: submissionForm.filePath }); 
+      showToast('success','已更新提交内容'); 
+    } else { 
+      await submissionApi.submit({ assignmentId, studentId: auth.userId, answerText: submissionForm.answerText, filePath: submissionForm.filePath }); 
+      showToast('success','作业提交成功'); 
+    } 
+    await loadMySubmission(assignmentId); 
+    // 重置文件上传区域
+    submissionForm.selectedFile = null;
+  } catch(e){ 
+    showToast('error', e.message || '提交失败'); 
+  } finally { 
+    loading.submission=false; 
+  } 
+};
 
 const saveProfileForm = async () => { try { const payload = { realName: state.profile.realName, email: state.profile.email, phone: state.profile.phone }; state.profile = await authApi.updateProfile(payload); showToast('success','个人信息已更新'); } catch(e){ showToast('error', e.message || '保存失败'); } };
 
@@ -138,7 +289,7 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
               v-for="cls in state.joinedClasses"
               :key="cls.id"
               :class="{ active: state.currentClassId === cls.id }"
-              @click="state.currentClassId = cls.id"
+              @click="viewClassMembers(cls.id)"
             >
               {{ cls.name }}
             </button>
@@ -212,7 +363,7 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
                   <td>{{ asn.description }}</td>
                   <td>
                     <span class="status-pill" :class="state.mySubmission?.assignmentId === asn.id ? 'success' : 'warning'">
-                      {{ state.mySubmission?.assignmentId === asn.id ? '已加载提交' : '点击加载' }}
+                      {{ state.mySubmission?.assignmentId === asn.id ? '已提交' : '未提交' }}
                     </span>
                   </td>
                 </tr>
@@ -231,10 +382,18 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
               答案内容
               <textarea v-model="submissionForm.answerText" placeholder="粘贴答案或作业说明"></textarea>
             </label>
-            <label>
-              附件链接
-              <input v-model="submissionForm.filePath" placeholder="网盘、Git 仓库等链接" />
-            </label>
+            </div>
+          <div style="margin-top: 1rem;">
+            <label style="margin-bottom: 0.5rem; display: block; font-weight: 500;">附件上传</label>
+            <FileUpload
+              v-model="submissionForm.selectedFile"
+              :upload-function="handleFileUpload"
+              @upload-error="handleFileUploadError"
+              accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar"
+            />
+          </div>
+          <div v-if="submissionForm.filePath" style="margin-top: 1rem; color: #64748b; font-size: 0.9rem;">
+            已上传文件: {{ submissionForm.filePath }}
           </div>
           <button class="primary" style="margin-top: 1rem;" :disabled="loading.submission" @click="submitAssignment()">
             {{ loading.submission ? '提交中...' : '提交 / 更新' }}
@@ -242,6 +401,48 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
           <p v-if="state.mySubmission" style="color: #64748b; margin-top: 0.5rem;">
             上次提交：{{ state.mySubmission.submittedAt || '未知时间' }}，评分 {{ state.mySubmission.score ?? '未评分' }}
           </p>
+        </div>
+      </div>
+
+      <div v-if="currentPage === 'class-members'" class="page-content">
+        <div class="card">
+          <div class="section-title">
+            <h3>班级成员列表</h3>
+            <span v-if="state.currentClassForMembers">
+              {{ state.currentClassForMembers.name }} (ID: {{ state.currentClassId }})
+            </span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>学生ID</th>
+                  <th>姓名</th>
+                  <th>邮箱</th>
+                  <th>电话</th>
+                  <th>加入时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="member in state.classMembers" :key="member.id">
+                  <td>{{ member.studentId }}</td>
+                  <td>{{ member.realName || '未填写' }}</td>
+                  <td>{{ member.email || '未填写' }}</td>
+                  <td>{{ member.phone || '未填写' }}</td>
+                  <td>{{ member.joinedAt ? member.joinedAt.split('T')[0] : '-' }}</td>
+                </tr>
+                <tr v-if="!state.classMembers.length && !loading.classMembers">
+                  <td colspan="5">暂无成员</td>
+                </tr>
+                <tr v-if="loading.classMembers">
+                  <td colspan="5">加载中...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top: 1rem;">
+            <button class="secondary" @click="switchPage('classes')">返回班级列表</button>
+          </div>
         </div>
       </div>
 

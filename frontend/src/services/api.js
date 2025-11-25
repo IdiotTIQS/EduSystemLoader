@@ -35,7 +35,20 @@ export const authApi = {
   register: (body) => api.post('/api/auth/register', body),
   login: (body) => api.post('/api/auth/login', body),
   getProfile: () => api.get('/api/users/profile'),
+  getUserProfile: (userId) => api.get(`/api/users/${userId}/profile`),
   updateProfile: (body) => api.put('/api/users/profile', body),
+};
+
+export const uploadApi = {
+  uploadFile: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/api/upload/file', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 
 export const classApi = {

@@ -25,9 +25,23 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(ex.getCode(), ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleIllegalArgument(IllegalArgumentException ex){
+        log.warn("参数错误: {}", ex.getMessage());
+        return ApiResponse.error(400, ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public ApiResponse<Void> handleMaxUploadSizeExceeded(org.springframework.web.multipart.MaxUploadSizeExceededException ex){
+        log.warn("文件大小超出限制: {}", ex.getMessage());
+        return ApiResponse.error(413, "文件大小超出限制，请选择小于100MB的文件");
+    }
+
     @ExceptionHandler(Exception.class)
     public ApiResponse<Void> handle(Exception ex){
         log.error("系统未处理异常", ex);
-        return ApiResponse.error(500, ex.getMessage());
+        return ApiResponse.error(500, "服务器内部错误，请稍后重试");
     }
 }

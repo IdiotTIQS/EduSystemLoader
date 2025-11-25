@@ -19,7 +19,6 @@ public class EnrollmentController {
     @RequireRole(UserRole.STUDENT)
     @PostMapping
     public ApiResponse<Enrollment> enroll(@RequestParam Long classId,@RequestParam Long studentId){log.info("学生加入班级 studentId={} classId={}", studentId,classId); return ApiResponse.ok(enrollmentService.enroll(classId,studentId));}
-    @RequireRole(UserRole.TEACHER)
     @GetMapping("/class/{classId}")
     public ApiResponse<List<Enrollment>> list(@PathVariable Long classId){log.debug("查询班级成员列表 classId={}", classId); return ApiResponse.ok(enrollmentService.listByClass(classId));}
     @GetMapping("/unique")
