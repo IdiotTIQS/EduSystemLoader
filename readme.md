@@ -2,6 +2,7 @@
 <p> This is a simple education system.Code base by GPT5-copilot</p>
 <p>大神AI</p>
 <p>API调用相关文档详见Apidoc.md</p>
+<p>项目已在 <a href="https://gitee.com/IdiotTIQS/EduSystemLoader.git">Gitee</a> 与 <a href="https://github.com/IdiotTIQS/EduSystemLoader.git">GitHub</a> 同步开源，欢迎 Star , Fork 与 Issue。</p>
 
 <h2>快速开始</h2>
 <p>本项目包含后端 Spring Boot 与前端 Vue(Vite)。以下命令均以 Windows <code>cmd.exe</code> 为例。</p>
