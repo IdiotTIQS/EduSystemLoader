@@ -6,7 +6,9 @@
 |[/api/courses](#courses)| 课程资源 | 
 |[/api/enrollments](#enrollments)| 班级成员 | 
 |[/api/submissions](#submissions)| 作业提交与评分 |
-|[/api/upload](#upload)| 文件上传 | 
+|[/api/upload](#upload)| 文件上传 |
+|[/api/cloud](#cloud)| 班级云盘 |
+|[/api/discussions](#discussions)| 班级讨论 | 
 
 ***
 ## 错误码列表
@@ -99,6 +101,60 @@
 | gradedAt | LocalDateTime | 评分时间 |
 | status | String | 状态 |
 
+#### CloudFile
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 文件ID |
+| classId | Long | 班级ID |
+| fileName | String | 存储文件名 |
+| originalFileName | String | 原始文件名 |
+| filePath | String | 文件路径 |
+| fileSize | Long | 文件大小(字节) |
+| fileType | String | 文件类型 |
+| description | String | 文件描述 |
+| uploaderId | Long | 上传者ID |
+| downloadCount | Integer | 下载次数 |
+| isPublic | Boolean | 是否公开 |
+| createdAt | LocalDateTime | 创建时间 |
+| updatedAt | LocalDateTime | 更新时间 |
+| uploaderName | String | 上传者姓名 |
+| uploaderRole | String | 上传者角色 |
+
+#### CloudFileStatistics
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| totalSize | Long | 总大小(字节) |
+| fileCount | Integer | 文件数量 |
+
+#### Discussion
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 讨论ID |
+| classId | Long | 班级ID |
+| title | String | 讨论标题 |
+| content | String | 讨论内容 |
+| authorId | Long | 作者ID |
+| isPinned | Boolean | 是否置顶 |
+| viewCount | Integer | 查看次数 |
+| createdAt | LocalDateTime | 创建时间 |
+| updatedAt | LocalDateTime | 更新时间 |
+| authorName | String | 作者姓名 |
+| commentCount | Integer | 评论数量 |
+
+#### Comment
+| 字段 | 类型 | 说明 |
+|----- |------| ---- |
+| id | Long | 评论ID |
+| discussionId | Long | 讨论ID |
+| parentId | Long | 父评论ID |
+| content | String | 评论内容 |
+| authorId | Long | 作者ID |
+| isEdited | Boolean | 是否已编辑 |
+| createdAt | LocalDateTime | 创建时间 |
+| updatedAt | LocalDateTime | 更新时间 |
+| authorName | String | 作者姓名 |
+| authorRole | String | 作者角色 |
+
 ## 鉴权说明
 
 ### JWT令牌认证
@@ -130,8 +186,8 @@
 4. **令牌撤销**: 目前不支持主动撤销，依赖过期机制
 
 权限概览：
-- **教师角色**：允许访问/操作 `POST|PUT|DELETE /api/assignments/**`、`POST|PUT|DELETE /api/classes/**`、`GET /api/classes/teacher/{teacherId}`、`POST|PUT|DELETE /api/courses/**`、`GET /api/enrollments/class/{classId}`、`GET /api/submissions`、`PUT /api/submissions/{id}/grade`。
-- **学生角色**：允许访问 `POST /api/enrollments`、`POST /api/submissions`、`PUT /api/submissions/{id}`。
+- **教师角色**：允许访问/操作 `POST|PUT|DELETE /api/assignments/**`、`POST|PUT|DELETE /api/classes/**`、`GET /api/classes/teacher/{teacherId}`、`POST|PUT|DELETE /api/courses/**`、`GET /api/enrollments/class/{classId}`、`GET /api/submissions`、`PUT /api/submissions/{id}/grade`、`POST /api/cloud/upload`、`PUT|DELETE /api/cloud/files/**`、`PUT /api/discussions/{id}/pin`。
+- **学生角色**：允许访问 `POST /api/enrollments`、`POST /api/submissions`、`PUT /api/submissions/{id}`、`GET /api/cloud/files/{id}/download`、`GET /api/cloud/files`、`GET /api/cloud/statistics`、`POST /api/discussions`、`POST /api/discussions/{discussionId}/comments`、`PUT /api/discussions/comments/{id}`、`DELETE /api/discussions/comments/{id}`。
 - **通用接口**：未列出的其余 GET/查询接口支持教师与学生共同访问 (如 `/unique`、资源详情查询等)。
 
 鉴权失败会返回 `401` 状态码以及 `{code:401,message:"无权限"}` 结构。
@@ -359,6 +415,336 @@ file: [binary data]
         - 文件按日期存储：/uploads/yyyy/MM/dd/
         - 返回格式：/uploads/yyyy/MM/dd/UUID.扩展名
         - 需要鉴权：所有用户角色均可上传文件
+
+---
+* <span id="cloud">班级云盘接口</span>
+    * 根路径：/api/cloud
+    * 说明：班级云盘文件管理，支持教师上传文件，学生下载文件
+    * 方法列表：
+        | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
+        |-----|------|------|---------|----------|-------------|
+        | POST | /api/cloud/upload | 上传云盘文件 | classId(FormData,Long), file(FormData,MultipartFile), description(FormData,String,可选), isPublic(FormData,Boolean) | - | CloudFile |
+        | GET | /api/cloud/files | 查询云盘文件列表 | classId(Query,Long), fileType(Query,String,可选), uploaderId(Query,Long,可选) | - | CloudFile[] |
+        | GET | /api/cloud/files/{id} | 获取文件详情 | id(Path,Long) | - | CloudFile |
+        | GET | /api/cloud/files/{id}/download | 下载文件 | id(Path,Long) | - | 二进制文件流 |
+        | PUT | /api/cloud/files/{id} | 更新文件信息 | id(Path,Long) | JSON CloudFile{description,isPublic} | CloudFile |
+        | DELETE | /api/cloud/files/{id} | 删除文件 | id(Path,Long) | - | null |
+        | GET | /api/cloud/statistics | 获取云盘统计信息 | classId(Query,Long) | - | CloudFileStatistics |
+
+    * 上传文件请求参数说明：
+        - classId: 班级ID（必需）
+        - file: 上传的文件（必需）
+        - description: 文件描述（可选，最大500字符）
+        - isPublic: 是否公开文件（可选，默认true）
+
+    * 查询文件列表参数说明：
+        - classId: 班级ID（必需）
+        - fileType: 文件类型过滤（可选，如image、document、spreadsheet等）
+        - uploaderId: 上传者ID过滤（可选，仅管理员可用）
+
+    * 文件分类说明：
+        - image: 图片文件 (jpg, jpeg, png, gif, bmp, webp, svg)
+        - document: 文档文件 (pdf, doc, docx, txt, rtf, odt)
+        - spreadsheet: 表格文件 (xls, xlsx, csv, ods)
+        - presentation: 演示文稿 (ppt, pptx, odp)
+        - archive: 压缩包 (zip, rar, 7z, tar, gz)
+
+    * 权限说明：
+        - 上传文件：仅教师角色
+        - 删除文件：仅文件上传者或教师角色
+        - 更新文件信息：仅文件上传者
+        - 下载公开文件：所有角色
+        - 下载私有文件：仅文件上传者
+        - 查看文件列表：所有角色
+        - 获取统计信息：所有角色
+
+    * 文件大小限制：
+        - 单个文件最大100MB
+        - 支持的文件类型：除可执行文件和脚本外的所有类型
+        - 危险文件类型：.exe, .bat, .cmd, .com, .scr, .msi, .dll, .so, .dylib, .sh, .bash, .zsh, .fish, .ps1, .py, .pl, .rb, .php, .asp, .jsp, .js, .vbs, .wsf, .jar, .app, .deb, .rpm, .dmg, .pkg, .iso, .img, .vmdk, .ova, .ovf
+
+    * 上传文件示例：
+        **请求:**
+        ```bash
+        POST /api/cloud/upload
+        Content-Type: multipart/form-data
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+        Content-Disposition: form-data; name="classId"
+        
+        1
+        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+        Content-Disposition: form-data; name="file"; filename="课件.pdf"
+        Content-Type: application/pdf
+
+        [binary file data]
+        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+        Content-Disposition: form-data; name="description"
+        
+        第三章课程课件
+        ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 1,
+            "classId": 1,
+            "fileName": "abc123-def456.pdf",
+            "originalFileName": "第三章课程课件.pdf",
+            "filePath": "/cloud/2024/11/26/abc123-def456.pdf",
+            "fileSize": 2048576,
+            "fileType": "pdf",
+            "description": "第三章课程课件",
+            "uploaderId": 1,
+            "downloadCount": 0,
+            "isPublic": true,
+            "createdAt": "2024-11-26T10:30:00",
+            "updatedAt": "2024-11-26T10:30:00",
+            "uploaderName": "张老师",
+            "uploaderRole": "TEACHER"
+          }
+        }
+        ```
+
+    * 查询文件列表示例：
+        **请求:**
+        ```bash
+        GET /api/cloud/files?classId=1&fileType=document
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": [
+            {
+              "id": 1,
+              "classId": 1,
+              "fileName": "course_notes.pdf",
+              "originalFileName": "课程笔记.pdf",
+              "filePath": "/cloud/2024/11/26/course_notes.pdf",
+              "fileSize": 1024000,
+              "fileType": "pdf",
+              "description": "第一章课程笔记",
+              "uploaderId": 1,
+              "downloadCount": 15,
+              "isPublic": true,
+              "createdAt": "2024-11-26T09:15:00",
+              "updatedAt": "2024-11-26T09:15:00",
+              "uploaderName": "张老师",
+              "uploaderRole": "TEACHER"
+            },
+            {
+              "id": 2,
+              "classId": 1,
+              "fileName": "homework_template.docx",
+              "originalFileName": "作业模板.docx",
+              "filePath": "/cloud/2024/11/25/homework_template.docx",
+              "fileSize": 512000,
+              "fileType": "docx",
+              "description": "作业模板",
+              "uploaderId": 1,
+              "downloadCount": 8,
+              "isPublic": false,
+              "createdAt": "2024-11-25T14:20:00",
+              "updatedAt": "2024-11-25T14:20:00",
+              "uploaderName": "张老师",
+              "uploaderRole": "TEACHER"
+            }
+          ]
+        }
+        ```
+
+    * 获取统计信息示例：
+        **请求:**
+        ```bash
+        GET /api/cloud/statistics?classId=1
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "totalSize": 2560576,
+            "fileCount": 2
+          }
+        }
+        ```
+
+---
+* <span id="discussions">班级讨论接口</span>
+    * 根路径：/api/discussions
+    * 说明：班级讨论功能，支持创建讨论主题、发表评论、回复等
+    * 方法列表：
+        | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
+        |-----|------|------|---------|----------|-------------|
+        | POST | /api/discussions | 创建讨论 | - | JSON Discussion{classId,title,content} | Discussion |
+        | GET | /api/discussions/{id} | 获取讨论详情 | id(Path,Long) | - | Discussion |
+        | GET | /api/discussions/class/{classId} | 班级讨论列表 | classId(Path,Long) | - | Discussion[] |
+        | PUT | /api/discussions/{id} | 更新讨论 | id(Path,Long) | JSON Discussion{title,content} | Discussion |
+        | DELETE | /api/discussions/{id} | 删除讨论 | id(Path,Long) | - | null |
+        | PUT | /api/discussions/{id}/pin | 置顶/取消置顶讨论 | id(Path,Long), isPinned(Query,Boolean) | - | Discussion |
+        | POST | /api/discussions/{discussionId}/comments | 发表评论 | discussionId(Path,Long) | JSON Comment{content,parentId} | Comment |
+        | GET | /api/discussions/{discussionId}/comments | 获取讨论评论列表 | discussionId(Path,Long) | - | Comment[] |
+        | PUT | /api/discussions/comments/{id} | 更新评论 | id(Path,Long) | JSON Comment{content} | Comment |
+        | DELETE | /api/discussions/comments/{id} | 删除评论 | id(Path,Long) | - | null |
+
+    * 请求参数类型：
+        - Discussion{classId(Long),title(String),content(String)}
+        - Comment{content(String),parentId(Long,可选)}
+
+    * 评论层级说明：
+        - parentId为null表示顶级评论
+        - parentId为其他评论ID表示回复评论
+        - 支持无限层级的回复结构
+
+    * 权限说明：
+        - 创建讨论：所有角色
+        | 更新讨论：仅讨论创建者
+        | 删除讨论：仅讨论创建者
+        | 置顶/取消置顶：仅教师角色
+        | 发表评论：所有角色
+        | 更新评论：仅评论作者
+        | 删除评论：仅评论作者
+        - 查看讨论和评论：所有角色
+
+    * 创建讨论示例：
+        **请求:**
+        ```bash
+        POST /api/discussions
+        Content-Type: application/json
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+        {
+          "classId": 1,
+          "title": "第一章学习讨论",
+          "content": "请大家讨论第一章的重点内容和难点"
+        }
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 1,
+            "classId": 1,
+            "title": "第一章学习讨论",
+            "content": "请大家讨论第一章的重点内容和难点",
+            "authorId": 1,
+            "isPinned": false,
+            "viewCount": 0,
+            "createdAt": "2024-11-26T10:00:00",
+            "updatedAt": "2024-11-26T10:00:00",
+            "authorName": "张老师",
+            "commentCount": 0
+          }
+        }
+        ```
+
+    * 发表评论示例：
+        **请求:**
+        ```bash
+        POST /api/discussions/1/comments
+        Content-Type: application/json
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+        {
+          "content": "我觉得第一章的重点是..."
+        }
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 1,
+            "discussionId": 1,
+            "parentId": null,
+            "content": "我觉得第一章的重点是...",
+            "authorId": 2,
+            "isEdited": false,
+            "createdAt": "2024-11-26T10:05:00",
+            "updatedAt": "2024-11-26T10:05:00",
+            "authorName": "学生A",
+            "authorRole": "STUDENT"
+          }
+        }
+        ```
+
+    * 回复评论示例：
+        **请求:**
+        ```bash
+        POST /api/discussions/1/comments
+        Content-Type: application/json
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+        {
+          "content": "@学生A 我也有同感",
+          "parentId": 1
+        }
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 2,
+            "discussionId": 1,
+            "parentId": 1,
+            "content": "@学生A 我也有同感",
+            "authorId": 1,
+            "isEdited": false,
+            "createdAt": "2024-11-26T10:10:00",
+            "updatedAt": "2024-11-26T10:10:00",
+            "authorName": "张老师",
+            "authorRole": "TEACHER"
+          }
+        }
+        ```
+
+    * 置顶讨论示例：
+        **请求:**
+        ```bash
+        PUT /api/discussions/1/pin?isPinned=true
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 1,
+            "classId": 1,
+            "title": "第一章学习讨论",
+            "content": "请大家讨论第一章的重点内容和难点",
+            "authorId": 1,
+            "isPinned": true,
+            "viewCount": 25,
+            "createdAt": "2024-11-26T10:00:00",
+            "updatedAt": "2024-11-26T10:30:00",
+            "authorName": "张老师",
+            "commentCount": 3
+          }
+        }
+        ```
 
 ---
 

@@ -1,10 +1,17 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const isAuthPage = () => {
+  return route.name === 'login' || route.name === 'register';
+};
 </script>
 
 <template>
   <div class="app-shell">
-    <header>
+    <header v-if="!isAuthPage()">
       <div>
         <h1>EduSystem Loader 控制台</h1>
         <p class="subtitle">教师、学生一体化教学协作平台</p>
@@ -16,7 +23,7 @@ import { RouterLink, RouterView } from 'vue-router';
         <RouterLink to="/student">学生端</RouterLink>
       </nav>
     </header>
-    <main class="page-body">
+    <main class="page-body" :class="{ 'full-height': isAuthPage() }">
       <RouterView />
     </main>
   </div>
@@ -27,5 +34,9 @@ import { RouterLink, RouterView } from 'vue-router';
   margin: 0.25rem 0 0;
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.85);
+}
+
+.full-height {
+  height: 100vh;
 }
 </style>
