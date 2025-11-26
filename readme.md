@@ -172,11 +172,79 @@
 );</code></pre>
 
 <h4>数据库配置</h4>
-<p>数据库连接配置在 <code>src/main/resources/application.properties</code> 中：</p>
-<pre><code>spring.datasource.url=jdbc:mysql://tiqs1337.icu:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-spring.datasource.username=eduloader
-spring.datasource.password=tiqs1337
+<p>数据库连接配置支持环境变量，在 <code>src/main/resources/application.properties</code> 中：</p>
+<pre><code>spring.datasource.url=${DB_URL:jdbc:mysql://tiqs1337.icu:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC}
+spring.datasource.username=${DB_USERNAME:eduloader}
+spring.datasource.password=${DB_PASSWORD:tiqs1337}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver</code></pre>
+
+<h4>环境变量配置</h4>
+<p>项目支持通过环境变量来配置敏感信息，提高安全性：</p>
+
+<h5>方法一：使用 .env 文件</h5>
+<ol>
+<li>复制环境变量模板文件：</li>
+<pre><code>cp .env.example .env</code></pre>
+<li>编辑 <code>.env</code> 文件，修改相应的配置：</li>
+<pre><code># 数据库配置
+DB_URL=jdbc:mysql://localhost:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# JWT配置
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRATION=604800000</code></pre>
+</ol>
+
+<h5>方法二：系统环境变量</h5>
+<p>直接在操作系统中设置环境变量：</p>
+<ul>
+<li><strong>Windows (CMD)</strong>:
+<pre><code>set DB_URL=jdbc:mysql://localhost:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+set DB_USERNAME=your_username
+set DB_PASSWORD=your_password
+set JWT_SECRET=your_jwt_secret_key</code></pre>
+</li>
+<li><strong>Windows (PowerShell)</strong>:
+<pre><code>$env:DB_URL="jdbc:mysql://localhost:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC"
+$env:DB_USERNAME="your_username"
+$env:DB_PASSWORD="your_password"
+$env:JWT_SECRET="your_jwt_secret_key"</code></pre>
+</li>
+<li><strong>Linux/Mac</strong>:
+<pre><code>export DB_URL="jdbc:mysql://localhost:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC"
+export DB_USERNAME="your_username"
+export DB_PASSWORD="your_password"
+export JWT_SECRET="your_jwt_secret_key"</code></pre>
+</li>
+</ul>
+
+<h5>方法三：启动时传递</h5>
+<p>在启动应用时直接传递环境变量：</p>
+<ul>
+<li><strong>Maven 启动</strong>:
+<pre><code>DB_URL=jdbc:mysql://localhost:3306/eduloader DB_USERNAME=your_username DB_PASSWORD=your_password mvnw.cmd spring-boot:run</code></pre>
+</li>
+<li><strong>JAR 启动</strong>:
+<pre><code>java -DB_URL=jdbc:mysql://localhost:3306/eduloader -DB_USERNAME=your_username -DB_PASSWORD=your_password -jar target/EduSystemLoader-0.0.1-SNAPSHOT.jar</code></pre>
+</li>
+</ul>
+
+<h5>环境变量说明</h5>
+<table>
+  <thead>
+    <tr><th>变量名</th><th>说明</th><th>默认值</th><th>必需</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>DB_URL</code></td><td>数据库连接URL</td><td><code>jdbc:mysql://tiqs1337.icu:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC</code></td><td>否</td></tr>
+    <tr><td><code>DB_USERNAME</code></td><td>数据库用户名</td><td><code>eduloader</code></td><td>否</td></tr>
+    <tr><td><code>DB_PASSWORD</code></td><td>数据库密码</td><td><code>tiqs1337</code></td><td>否</td></tr>
+    <tr><td><code>JWT_SECRET</code></td><td>JWT签名密钥</td><td><code>eduSystemLoaderSecretKey2024ForJWTTokenGeneration</code></td><td>否</td></tr>
+    <tr><td><code>JWT_EXPIRATION</code></td><td>JWT过期时间（毫秒）</td><td><code>604800000</code> (7天)</td><td>否</td></tr>
+  </tbody>
+</table>
+
+<p><strong>注意</strong>：<code>.env</code> 文件已添加到 <code>.gitignore</code> 中，不会被提交到版本控制系统，确保敏感信息安全。</p>
 
 <h2>快速开始</h2>
 <p>本项目包含后端 Spring Boot 与前端 Vue(Vite)。以下命令均以 Windows <code>cmd.exe</code> 为例。</p>
