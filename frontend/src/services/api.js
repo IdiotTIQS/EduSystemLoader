@@ -93,4 +93,43 @@ export const submissionApi = {
   grade: (id, score, feedback) => api.put(`/api/submissions/${id}/grade`, null, { params: { score, feedback } }),
 };
 
+export const discussionApi = {
+  create: (body) => api.post('/api/discussions', body),
+  get: (id) => api.get(`/api/discussions/${id}`),
+  listByClass: (classId) => api.get(`/api/discussions/class/${classId}`),
+  update: (id, body) => api.put(`/api/discussions/${id}`, body),
+  delete: (id) => api.delete(`/api/discussions/${id}`),
+  updatePinnedStatus: (id, isPinned) => api.put(`/api/discussions/${id}/pin`, null, { params: { isPinned } }),
+  createComment: (discussionId, body) => api.post(`/api/discussions/${discussionId}/comments`, body),
+  listComments: (discussionId) => api.get(`/api/discussions/${discussionId}/comments`),
+  updateComment: (id, body) => api.put(`/api/discussions/comments/${id}`, body),
+  deleteComment: (id) => api.delete(`/api/discussions/comments/${id}`),
+};
+
+export const cloudFileApi = {
+  uploadFile: (classId, file, description, isPublic) => {
+    const formData = new FormData();
+    formData.append('classId', classId);
+    formData.append('file', file);
+    if (description) formData.append('description', description);
+    formData.append('isPublic', isPublic !== false);
+    return api.post('/api/cloud/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  listFiles: (classId, fileType, uploaderId) => api.get('/api/cloud/files', { 
+    params: { classId, fileType, uploaderId } 
+  }),
+  getFile: (id) => api.get(`/api/cloud/files/${id}`),
+  updateFile: (id, body) => api.put(`/api/cloud/files/${id}`, body),
+  deleteFile: (id) => api.delete(`/api/cloud/files/${id}`),
+  downloadFile: (id) => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    return `${baseUrl}/api/cloud/files/${id}/download`;
+  },
+  getStatistics: (classId) => api.get('/api/cloud/statistics', { params: { classId } }),
+};
+
 export default api;

@@ -1,8 +1,12 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { assignmentApi, authApi, classApi, courseApi, enrollmentApi, submissionApi } from '../services/api';
+import { assignmentApi, authApi, classApi, courseApi, enrollmentApi, submissionApi, discussionApi, cloudFileApi } from '../services/api';
 import { clearAuth, getAuth } from '../services/auth';
+import DiscussionList from '../components/DiscussionList.vue';
+import DiscussionDetail from '../components/DiscussionDetail.vue';
+import CreateDiscussion from '../components/CreateDiscussion.vue';
+import CloudDrive from '../components/CloudDrive.vue';
 
 const router = useRouter();
 const auth = getAuth();
@@ -34,6 +38,8 @@ const state = reactive({
   selectedCourseId: '',
   selectedAssignmentId: '',
   selectedStudentId: '',
+  discussionView: 'list', // 'list', 'detail', 'create'
+  selectedDiscussionId: null,
   classForm: {
     name: '',
     code: '',
@@ -77,7 +83,9 @@ const pageTitle = computed(() => {
     assignments: '作业发布',
     members: '班级成员',
     submissions: '提交管理',
-    submissionDetail: '提交详情'
+    submissionDetail: '提交详情',
+    discussions: '班级讨论',
+    'cloud-drive': '班级云盘'
   };
   return titles[currentPage.value] || '控制面板';
 });
@@ -89,7 +97,9 @@ const pageSubtitle = computed(() => {
     assignments: '发布和管理课程作业',
     members: '查看和管理班级学生成员',
     submissions: '查看学生作业提交情况',
-    submissionDetail: '查看学生提交的具体内容'
+    submissionDetail: '查看学生提交的具体内容',
+    discussions: '管理班级讨论和学生交流',
+    'cloud-drive': '管理班级共享文件和资源'
   };
   return subtitles[currentPage.value] || '教师端控制面板';
 });
@@ -447,6 +457,25 @@ const downloadFile = async (fileUrl, originalFileName) => {
   }
 };
 
+const selectDiscussion = (discussion) => {
+  state.selectedDiscussionId = discussion.id;
+  state.discussionView = 'detail';
+};
+
+const createDiscussion = () => {
+  state.discussionView = 'create';
+};
+
+const discussionCreated = (discussion) => {
+  showToast('success', '讨论发布成功');
+  state.discussionView = 'list';
+};
+
+const backToDiscussionList = () => {
+  state.discussionView = 'list';
+  state.selectedDiscussionId = null;
+};
+
 onMounted(async () => {
   await fetchClasses();
   await fetchCourses();
@@ -510,6 +539,16 @@ watch(
           @click="switchPage('members')" 
           :class="['nav-item', { active: currentPage === 'members' }]">
           班级成员
+        </button>
+        <button 
+          @click="switchPage('discussions')" 
+          :class="['nav-item', { active: currentPage === 'discussions' }]">
+          班级讨论
+        </button>
+        <button 
+          @click="switchPage('cloud-drive')" 
+          :class="['nav-item', { active: currentPage === 'cloud-drive' }]">
+          班级云盘
         </button>
         <button 
           @click="switchPage('submissions')" 
@@ -737,6 +776,59 @@ watch(
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- 班级讨论页面 -->
+      <div v-if="currentPage === 'discussions'" class="page-content">
+        <div v-if="!state.selectedClassId" class="card">
+          <div class="section-title">
+            <h3>班级讨论</h3>
+            <span>请先选择一个班级</span>
+          </div>
+          <p style="color: #64748b; text-align: center; padding: 2rem;">
+            请先在"班级管理"页面中选择一个班级，然后才能管理讨论。
+          </p>
+        </div>
+
+        <div v-else-if="state.discussionView === 'list'" class="page-content">
+          <DiscussionList
+            :class-id="state.selectedClassId"
+            @select-discussion="selectDiscussion"
+            @create-discussion="createDiscussion"
+          />
+        </div>
+
+        <div v-else-if="state.discussionView === 'detail'" class="page-content">
+          <DiscussionDetail
+            :discussion-id="state.selectedDiscussionId"
+            @back-to-list="backToDiscussionList"
+          />
+        </div>
+
+        <div v-else-if="state.discussionView === 'create'" class="page-content">
+          <CreateDiscussion
+            :class-id="state.selectedClassId"
+            @discussion-created="discussionCreated"
+            @cancel="backToDiscussionList"
+          />
+        </div>
+      </div>
+
+      <!-- 班级云盘页面 -->
+      <div v-if="currentPage === 'cloud-drive'" class="page-content">
+        <div v-if="!state.selectedClassId" class="card">
+          <div class="section-title">
+            <h3>班级云盘</h3>
+            <span>请先选择一个班级</span>
+          </div>
+          <p style="color: #64748b; text-align: center; padding: 2rem;">
+            请先在"班级管理"页面中选择一个班级，然后才能管理云盘文件。
+          </p>
+        </div>
+
+        <div v-else class="page-content">
+          <CloudDrive :class-id="state.selectedClassId" :is-teacher="true" />
         </div>
       </div>
 
