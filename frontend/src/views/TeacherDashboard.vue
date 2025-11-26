@@ -573,7 +573,8 @@ watch(
         {{ toast.text }}
       </div>
 
-      <div v-if="currentPage === 'classes'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'classes'" class="page-content" key="classes">
         <div class="card">
           <div class="section-title">
             <h3>创建班级</h3>
@@ -624,8 +625,10 @@ watch(
           </div>
         </div>
       </div>
+        </transition>
 
-      <div v-if="currentPage === 'courses'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'courses'" class="page-content" key="courses">
         <div class="card">
           <div class="section-title">
             <h3>创建课程</h3>
@@ -684,8 +687,10 @@ watch(
           </div>
         </div>
       </div>
+        </transition>
 
-      <div v-if="currentPage === 'assignments'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'assignments'" class="page-content" key="assignments">
         <div class="card">
           <div class="section-title">
             <h3>发布作业</h3>
@@ -741,8 +746,10 @@ watch(
           </div>
         </div>
       </div>
+        </transition>
 
-      <div v-if="currentPage === 'members'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'members'" class="page-content" key="members">
         <div class="card">
           <div class="section-title">
             <h3>班级成员</h3>
@@ -778,9 +785,11 @@ watch(
           </div>
         </div>
       </div>
+        </transition>
 
       <!-- 班级讨论页面 -->
-      <div v-if="currentPage === 'discussions'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'discussions'" class="page-content" key="discussions">
         <div v-if="!state.selectedClassId" class="card">
           <div class="section-title">
             <h3>班级讨论</h3>
@@ -814,9 +823,11 @@ watch(
           />
         </div>
       </div>
+        </transition>
 
       <!-- 班级云盘页面 -->
-      <div v-if="currentPage === 'cloud-drive'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'cloud-drive'" class="page-content" key="cloud-drive">
         <div v-if="!state.selectedClassId" class="card">
           <div class="section-title">
             <h3>班级云盘</h3>
@@ -831,9 +842,11 @@ watch(
           <CloudDrive :class-id="state.selectedClassId" :is-teacher="true" />
         </div>
       </div>
+        </transition>
 
       <!-- 提交管理页面 -->
-      <div v-if="currentPage === 'submissions'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'submissions'" class="page-content" key="submissions">
         <div class="card">
           <div class="section-title">
             <h3>选择作业</h3>
@@ -918,10 +931,12 @@ watch(
             </table>
           </div>
         </div>
-      </div>
+        </div>
+        </transition>
 
       <!-- 提交详情页面 -->
-      <div v-if="currentPage === 'submissionDetail'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'submissionDetail'" class="page-content" key="submissionDetail">
         <div class="card">
           <div class="section-title">
             <h3>提交详情</h3>
@@ -1028,6 +1043,7 @@ watch(
           </div>
         </div>
       </div>
+        </transition>
     </main>
   </section>
 </template>
@@ -1049,6 +1065,17 @@ watch(
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(15, 23, 42, 0.05);
   flex-shrink: 0;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .sidebar-header {
@@ -1306,6 +1333,35 @@ watch(
   max-height: 80vh;
   object-fit: contain;
   border-radius: 4px;
+}
+
+/* 页面过渡动画 */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.page-fade-enter-active .card,
+.page-fade-leave-active .card {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-enter-from .card {
+  transform: translateY(10px);
+}
+
+.page-fade-leave-to .card {
+  transform: translateY(-10px);
 }
 
 @media (max-width: 768px) {
