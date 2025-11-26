@@ -4,6 +4,180 @@
 <p>API调用相关文档详见Apidoc.md</p>
 <p>项目已在 <a href="https://gitee.com/IdiotTIQS/EduSystemLoader.git">Gitee</a> 与 <a href="https://github.com/IdiotTIQS/EduSystemLoader.git">GitHub</a> 同步开源，欢迎 Star , Fork 与 Issue。</p>
 
+<h2>数据库设计</h2>
+<p>本项目使用MySQL数据库，以下为完整的数据库表结构设计：</p>
+
+<h3>用户表 (users)</h3>
+<pre><code>CREATE TABLE users (
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username      VARCHAR(64) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role          ENUM('TEACHER', 'STUDENT') NOT NULL,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL
+);</code></pre>
+
+<h3>班级表 (classes)</h3>
+<pre><code>CREATE TABLE classes (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(128) NOT NULL,
+    code       VARCHAR(16) NOT NULL UNIQUE,
+    teacher_id BIGINT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    FOREIGN KEY (teacher_id) REFERENCES users(id),
+    INDEX idx_classes_teacher(teacher_id)
+);</code></pre>
+
+<h3>云文件表 (cloud_files)</h3>
+<pre><code>CREATE TABLE cloud_files (
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    class_id           BIGINT NOT NULL,
+    file_name          VARCHAR(255) NOT NULL,
+    original_file_name VARCHAR(255) NOT NULL,
+    file_path          VARCHAR(500) NOT NULL,
+    file_size          BIGINT NOT NULL,
+    file_type          VARCHAR(100) NOT NULL,
+    description        TEXT,
+    uploader_id        BIGINT NOT NULL,
+    download_count     INT DEFAULT 0,
+    is_public          TINYINT(1) DEFAULT 1,
+    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_class_id(class_id),
+    INDEX idx_created_at(created_at),
+    INDEX idx_file_type(file_type),
+    INDEX idx_uploader_id(uploader_id)
+);</code></pre>
+
+<h3>课程表 (courses)</h3>
+<pre><code>CREATE TABLE courses (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(128) NOT NULL,
+    description TEXT,
+    class_id    BIGINT NOT NULL,
+    teacher_id  BIGINT NOT NULL,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_id) REFERENCES users(id),
+    INDEX idx_course_class(class_id),
+    INDEX idx_course_teacher(teacher_id)
+);</code></pre>
+
+<h3>作业表 (assignments)</h3>
+<pre><code>CREATE TABLE assignments (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id   BIGINT NOT NULL,
+    title       VARCHAR(128) NOT NULL,
+    description TEXT,
+    deadline    DATETIME NOT NULL,
+    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    INDEX idx_assignment_course(course_id),
+    INDEX idx_assignment_deadline(deadline)
+);</code></pre>
+
+<h3>课程资料表 (course_materials)</h3>
+<pre><code>CREATE TABLE course_materials (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    course_id  BIGINT NOT NULL,
+    type       ENUM('PDF', 'PPT', 'LINK', 'TEXT', 'OTHER') NOT NULL,
+    name       VARCHAR(128) NOT NULL,
+    url        VARCHAR(255),
+    content    TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    INDEX idx_material_course(course_id)
+);</code></pre>
+
+<h3>讨论表 (discussions)</h3>
+<pre><code>CREATE TABLE discussions (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    class_id   BIGINT NOT NULL,
+    title      VARCHAR(255) NOT NULL,
+    content    TEXT NOT NULL,
+    author_id  BIGINT NOT NULL,
+    is_pinned  TINYINT(1) DEFAULT 0,
+    view_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_class_id(class_id),
+    INDEX idx_author_id(author_id),
+    INDEX idx_created_at(created_at),
+    INDEX idx_is_pinned(is_pinned)
+);</code></pre>
+
+<h3>评论表 (comments)</h3>
+<pre><code>CREATE TABLE comments (
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    discussion_id BIGINT NOT NULL,
+    parent_id     BIGINT,
+    content       TEXT NOT NULL,
+    author_id     BIGINT NOT NULL,
+    is_edited     TINYINT(1) DEFAULT 0,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
+    FOREIGN KEY (discussion_id) REFERENCES discussions(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_discussion_id(discussion_id),
+    INDEX idx_parent_id(parent_id),
+    INDEX idx_author_id(author_id),
+    INDEX idx_created_at(created_at)
+);</code></pre>
+
+<h3>选课表 (enrollments)</h3>
+<pre><code>CREATE TABLE enrollments (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    class_id   BIGINT NOT NULL,
+    student_id BIGINT NOT NULL,
+    joined_at  DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    UNIQUE KEY uk_enroll(class_id, student_id),
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_enroll_student(student_id)
+);</code></pre>
+
+<h3>作业提交表 (submissions)</h3>
+<pre><code>CREATE TABLE submissions (
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    assignment_id      BIGINT NOT NULL,
+    student_id         BIGINT NOT NULL,
+    file_path          VARCHAR(255),
+    answer_text        TEXT,
+    submitted_at       DATETIME DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    score              DECIMAL(5, 2),
+    feedback           TEXT,
+    graded_at          DATETIME,
+    status             ENUM('SUBMITTED', 'GRADED') DEFAULT 'SUBMITTED' NOT NULL,
+    original_file_name VARCHAR(255) COMMENT '原始文件名',
+    UNIQUE KEY uk_submission_unique(assignment_id, student_id),
+    FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_submission_assignment_score(assignment_id, score),
+    INDEX idx_submission_student(student_id),
+    INDEX idx_submissions_original_file_name(original_file_name)
+);</code></pre>
+
+<h3>用户资料表 (user_profile)</h3>
+<pre><code>CREATE TABLE user_profile (
+    user_id   BIGINT NOT NULL PRIMARY KEY,
+    real_name VARCHAR(64),
+    email     VARCHAR(128),
+    phone     VARCHAR(32),
+    UNIQUE KEY uk_user_profile_email(email),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);</code></pre>
+
+<h4>数据库配置</h4>
+<p>数据库连接配置在 <code>src/main/resources/application.properties</code> 中：</p>
+<pre><code>spring.datasource.url=jdbc:mysql://tiqs1337.icu:3306/eduloader?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+spring.datasource.username=eduloader
+spring.datasource.password=tiqs1337
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver</code></pre>
+
 <h2>快速开始</h2>
 <p>本项目包含后端 Spring Boot 与前端 Vue(Vite)。以下命令均以 Windows <code>cmd.exe</code> 为例。</p>
 
