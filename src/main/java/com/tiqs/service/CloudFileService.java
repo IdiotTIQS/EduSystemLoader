@@ -5,10 +5,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CloudFileService {
-    CloudFile uploadFile(Long classId, Long uploaderId, MultipartFile file, String description, Boolean isPublic);
+    CloudFile uploadFile(Long classId, Long uploaderId, MultipartFile file, String description, Boolean isPublic, Long folderId);
     List<CloudFile> listByClass(Long classId);
     List<CloudFile> listByClassAndFileType(Long classId, String fileType);
     List<CloudFile> listByClassAndUploader(Long classId, Long uploaderId);
+    List<CloudFile> listByFolder(Long folderId);
+    CloudFile moveFile(Long fileId, Long folderId, Long userId);
     CloudFile get(Long id);
     CloudFile update(CloudFile cloudFile, Long userId);
     void delete(Long id, Long userId);

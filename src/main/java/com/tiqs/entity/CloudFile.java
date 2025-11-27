@@ -26,6 +26,9 @@ public class CloudFile {
     
     private String uploaderName;
     private String uploaderRole;
+    private Long folderId;
+    private String folderPath;
+    private String folderName;
     
     public String getFormattedFileSize() {
         if (fileSize == null) return "0 B";

@@ -107,29 +107,58 @@ export const discussionApi = {
 };
 
 export const cloudFileApi = {
-  uploadFile: (classId, file, description, isPublic) => {
+  uploadFile: (classId, file, description, isPublic, folderId) => {
     const formData = new FormData();
     formData.append('classId', classId);
     formData.append('file', file);
     if (description) formData.append('description', description);
     formData.append('isPublic', isPublic !== false);
+    if (folderId) formData.append('folderId', folderId);
     return api.post('/api/cloud/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
   },
-  listFiles: (classId, fileType, uploaderId) => api.get('/api/cloud/files', { 
-    params: { classId, fileType, uploaderId } 
+  listFiles: (classId, fileType, uploaderId, folderId) => api.get('/api/cloud/files', { 
+    params: { classId, fileType, uploaderId, folderId } 
   }),
   getFile: (id) => api.get(`/api/cloud/files/${id}`),
   updateFile: (id, body) => api.put(`/api/cloud/files/${id}`, body),
   deleteFile: (id) => api.delete(`/api/cloud/files/${id}`),
+  moveFile: (id, folderId) => api.put(`/api/cloud/files/${id}/move`, null, {
+    params: { folderId }
+  }),
   downloadFile: (id) => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
     return `${baseUrl}/api/cloud/files/${id}/download`;
   },
   getStatistics: (classId) => api.get('/api/cloud/statistics', { params: { classId } }),
+};
+
+export const cloudFolderApi = {
+  createFolder: (classId, name, parentFolderId) => api.post('/api/cloud/folders', null, {
+    params: { classId, name, parentFolderId }
+  }),
+  getRootFolders: (classId) => api.get('/api/cloud/folders/root', {
+    params: { classId }
+  }),
+  getFolder: (id) => api.get(`/api/cloud/folders/${id}`),
+  getSubFolders: (id) => api.get(`/api/cloud/folders/${id}/subfolders`),
+  getFolderTree: (id) => api.get(`/api/cloud/folders/${id}/tree`),
+  renameFolder: (id, name) => api.put(`/api/cloud/folders/${id}/rename`, null, {
+    params: { name }
+  }),
+  moveFolder: (id, parentFolderId) => api.put(`/api/cloud/folders/${id}/move`, null, {
+    params: { parentFolderId }
+  }),
+  deleteFolder: (id) => api.delete(`/api/cloud/folders/${id}`),
+  searchFolders: (classId, keyword) => api.get('/api/cloud/folders/search', {
+    params: { classId, keyword }
+  }),
+  getStatistics: (classId) => api.get('/api/cloud/folders/statistics', {
+    params: { classId }
+  }),
 };
 
 export default api;

@@ -6,6 +6,10 @@ const props = defineProps({
   classId: {
     type: Number,
     required: true
+  },
+  folderId: {
+    type: Number,
+    default: null
   }
 });
 
@@ -155,7 +159,8 @@ const uploadFile = async () => {
       props.classId,
       form.file,
       form.description.trim() || undefined,
-      form.isPublic
+      form.isPublic,
+      props.folderId
     );
     
     clearInterval(progressInterval);

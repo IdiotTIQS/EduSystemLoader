@@ -36,12 +36,13 @@ public class CloudFileController {
             @RequestParam("classId") Long classId,
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "isPublic", defaultValue = "true") Boolean isPublic) {
+            @RequestParam(value = "isPublic", defaultValue = "true") Boolean isPublic,
+            @RequestParam(value = "folderId", required = false) Long folderId) {
         
         Long userId = AuthContextHolder.get().getUserId();
-        log.info("请求上传云盘文件 classId={} fileName={} userId={}", classId, file.getOriginalFilename(), userId);
+        log.info("请求上传云盘文件 classId={} fileName={} userId={} folderId={}", classId, file.getOriginalFilename(), userId, folderId);
         
-        CloudFile cloudFile = cloudFileService.uploadFile(classId, userId, file, description, isPublic);
+        CloudFile cloudFile = cloudFileService.uploadFile(classId, userId, file, description, isPublic, folderId);
         return ApiResponse.ok(cloudFile);
     }
     
@@ -49,12 +50,15 @@ public class CloudFileController {
     public ApiResponse<List<CloudFile>> listFiles(
             @RequestParam("classId") Long classId,
             @RequestParam(value = "fileType", required = false) String fileType,
-            @RequestParam(value = "uploaderId", required = false) Long uploaderId) {
+            @RequestParam(value = "uploaderId", required = false) Long uploaderId,
+            @RequestParam(value = "folderId", required = false) Long folderId) {
         
-        log.debug("查询云盘文件列表 classId={} fileType={} uploaderId={}", classId, fileType, uploaderId);
+        log.debug("查询云盘文件列表 classId={} fileType={} uploaderId={} folderId={}", classId, fileType, uploaderId, folderId);
         
         List<CloudFile> files;
-        if (uploaderId != null) {
+        if (folderId != null) {
+            files = cloudFileService.listByFolder(folderId);
+        } else if (uploaderId != null) {
             files = cloudFileService.listByClassAndUploader(classId, uploaderId);
         } else if (fileType != null) {
             files = cloudFileService.listByClassAndFileType(classId, fileType);
@@ -120,5 +124,17 @@ public class CloudFileController {
         log.debug("获取云盘统计信息 classId={}", classId);
         CloudFileService.CloudFileStatistics statistics = cloudFileService.getStatistics(classId);
         return ApiResponse.ok(statistics);
+    }
+    
+    @PutMapping("/files/{id}/move")
+    public ApiResponse<CloudFile> moveFile(
+            @PathVariable Long id,
+            @RequestParam(value = "folderId", required = false) Long folderId) {
+        
+        Long userId = AuthContextHolder.get().getUserId();
+        log.info("移动文件 id={} folderId={} userId={}", id, folderId, userId);
+        
+        CloudFile cloudFile = cloudFileService.moveFile(id, folderId, userId);
+        return ApiResponse.ok(cloudFile);
     }
 }

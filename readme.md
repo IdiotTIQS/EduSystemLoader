@@ -27,6 +27,26 @@
     INDEX idx_classes_teacher(teacher_id)
 );</code></pre>
 
+<h3>云文件夹表 (cloud_folders)</h3>
+<pre><code>CREATE TABLE cloud_folders (
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    class_id         BIGINT NOT NULL,
+    name             VARCHAR(255) NOT NULL,
+    parent_folder_id BIGINT,
+    path             VARCHAR(1000) NOT NULL,
+    creator_id       BIGINT NOT NULL,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
+    UNIQUE KEY uk_folder_path(class_id, path) USING HASH,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_folder_id) REFERENCES cloud_folders(id) ON DELETE CASCADE,
+    FOREIGN KEY (creator_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_class_id(class_id),
+    INDEX idx_creator_id(creator_id),
+    INDEX idx_parent_folder_id(parent_folder_id),
+    INDEX idx_path(path(768))
+);</code></pre>
+
 <h3>云文件表 (cloud_files)</h3>
 <pre><code>CREATE TABLE cloud_files (
     id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -42,12 +62,15 @@
     is_public          TINYINT(1) DEFAULT 1,
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
     updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL ON UPDATE CURRENT_TIMESTAMP(),
+    folder_id          BIGINT,
     FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
     FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (folder_id) REFERENCES cloud_folders(id) ON DELETE SET NULL,
     INDEX idx_class_id(class_id),
     INDEX idx_created_at(created_at),
     INDEX idx_file_type(file_type),
-    INDEX idx_uploader_id(uploader_id)
+    INDEX idx_uploader_id(uploader_id),
+    INDEX idx_folder_id(folder_id)
 );</code></pre>
 
 <h3>课程表 (courses)</h3>

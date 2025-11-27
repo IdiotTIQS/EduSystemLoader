@@ -35,7 +35,7 @@ public class CloudFileServiceImpl implements CloudFileService {
     }
     
     @Transactional
-    public CloudFile uploadFile(Long classId, Long uploaderId, MultipartFile file, String description, Boolean isPublic) {
+    public CloudFile uploadFile(Long classId, Long uploaderId, MultipartFile file, String description, Boolean isPublic, Long folderId) {
         if (file.isEmpty()) {
             throw BusinessException.of(400, "文件不能为空");
         }
@@ -85,6 +85,7 @@ public class CloudFileServiceImpl implements CloudFileService {
             cloudFile.setUploaderId(uploaderId);
             cloudFile.setDownloadCount(0);
             cloudFile.setIsPublic(isPublic != null ? isPublic : true);
+            cloudFile.setFolderId(folderId);
             
             cloudFileMapper.insert(cloudFile);
             
@@ -235,5 +236,22 @@ public class CloudFileServiceImpl implements CloudFileService {
             }
         }
         return false;
+    }
+    
+    @Override
+    public List<CloudFile> listByFolder(Long folderId) {
+        return cloudFileMapper.findByFolderId(folderId);
+    }
+    
+    @Override
+    @Transactional
+    public CloudFile moveFile(Long fileId, Long folderId, Long userId) {
+        log.info("移动文件 fileId={} folderId={} userId={}", fileId, folderId, userId);
+        
+        CloudFile cloudFile = get(fileId);
+        cloudFileMapper.moveFile(fileId, folderId);
+        cloudFile.setFolderId(folderId);
+        
+        return cloudFile;
     }
 }
