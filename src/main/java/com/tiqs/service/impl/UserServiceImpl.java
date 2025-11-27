@@ -19,6 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+/**
+ * 用户服务实现类
+ * 
+ * @author EduSystemLoader
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

@@ -7,7 +7,8 @@
 |[/api/enrollments](#enrollments)| 班级成员 | 
 |[/api/submissions](#submissions)| 作业提交与评分 |
 |[/api/upload](#upload)| 文件上传 |
-|[/api/cloud](#cloud)| 班级云盘 |
+|[/api/cloud](#cloud)| 班级云盘文件管理 |
+|[/api/cloud/folders](#cloud-folders)| 班级云盘文件夹管理 |
 |[/api/discussions](#discussions)| 班级讨论 | 
 
 ***
@@ -742,6 +743,179 @@ file: [binary data]
             "updatedAt": "2024-11-26T10:30:00",
             "authorName": "张老师",
             "commentCount": 3
+          }
+        }
+        ```
+
+---
+* <span id="cloud-folders">班级云盘文件夹接口</span>
+    * 根路径：/api/cloud/folders
+    * 说明：班级云盘文件夹管理，支持创建文件夹、文件夹层级结构、移动重命名等
+    * 方法列表：
+        | 方法 | 路径 | 说明 | 请求参数 | 体/Query | 返回data类型 |
+        |-----|------|------|---------|----------|-------------|
+        | POST | /api/cloud/folders | 创建文件夹 | - | JSON CloudFolder{classId,name,parentFolderId} | CloudFolder |
+        | GET | /api/cloud/folders/root | 获取根文件夹列表 | classId(Query,Long) | - | CloudFolder[] |
+        | GET | /api/cloud/folders/{id} | 获取文件夹详情 | id(Path,Long) | - | CloudFolder |
+        | GET | /api/cloud/folders/{id}/subfolders | 获取子文件夹列表 | id(Path,Long) | - | CloudFolder[] |
+        | GET | /api/cloud/folders/{id}/tree | 获取文件夹树形结构 | id(Path,Long) | - | CloudFolder |
+        | PUT | /api/cloud/folders/{id}/rename | 重命名文件夹 | id(Path,Long), name(Query,String) | - | CloudFolder |
+        | PUT | /api/cloud/folders/{id}/move | 移动文件夹 | id(Path,Long), parentFolderId(Query,Long) | - | CloudFolder |
+        | DELETE | /api/cloud/folders/{id} | 删除文件夹 | id(Path,Long) | - | null |
+        | GET | /api/cloud/folders/search | 搜索文件夹 | classId(Query,Long), keyword(Query,String) | - | CloudFolder[] |
+        | GET | /api/cloud/folders/statistics | 获取文件夹统计信息 | classId(Query,Long) | - | CloudFolderStatistics |
+
+    * 请求参数类型：CloudFolder{classId(Long),name(String),parentFolderId(Long,可选)}
+
+    * 返回数据类型补充：
+        #### CloudFolder
+        | 字段 | 类型 | 说明 |
+        |----- |------| ---- |
+        | id | Long | 文件夹ID |
+        | classId | Long | 班级ID |
+        | name | String | 文件夹名称 |
+        | parentFolderId | Long | 父文件夹ID |
+        | path | String | 文件夹路径 |
+        | creatorId | Long | 创建者ID |
+        | createdAt | LocalDateTime | 创建时间 |
+        | updatedAt | LocalDateTime | 更新时间 |
+        | parentFolder | CloudFolder | 父文件夹对象 |
+        | subFolders | CloudFolder[] | 子文件夹列表 |
+        | files | CloudFile[] | 文件列表 |
+        | creatorName | String | 创建者姓名 |
+        | fileCount | Integer | 文件数量 |
+        | folderCount | Integer | 子文件夹数量 |
+
+        #### CloudFolderStatistics
+        | 字段 | 类型 | 说明 |
+        |----- |------| ---- |
+        | totalFolders | Integer | 总文件夹数量 |
+        | totalFiles | Integer | 总文件数量 |
+        | totalSize | Long | 总大小(字节) |
+        | maxDepth | Integer | 最大层级深度 |
+
+    * 文件夹层级说明：
+        - parentFolderId为null表示根级文件夹
+        - parentFolderId为其他文件夹ID表示子文件夹
+        - 支持无限层级的文件夹结构
+        - path字段记录完整路径，如"/根文件夹/子文件夹"
+
+    * 权限说明：
+        - 创建文件夹：仅教师角色
+        - 删除文件夹：仅文件夹创建者或教师角色
+        - 重命名文件夹：仅文件夹创建者
+        - 移动文件夹：仅文件夹创建者
+        - 查看文件夹：所有角色
+        - 搜索文件夹：所有角色
+
+    * 文件夹操作限制：
+        - 不能删除包含文件的文件夹（需先删除或移动所有文件）
+        - 不能移动文件夹到其子文件夹中（避免循环引用）
+        - 不能重命名为已存在的同名文件夹（同级内）
+        - 文件夹名称最大长度：100字符
+        - 最大层级深度：10层
+
+    * 创建文件夹示例：
+        **请求:**
+        ```bash
+        POST /api/cloud/folders
+        Content-Type: application/json
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+        {
+          "classId": 1,
+          "name": "第一章课件",
+          "parentFolderId": null
+        }
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 1,
+            "classId": 1,
+            "name": "第一章课件",
+            "parentFolderId": null,
+            "path": "/",
+            "creatorId": 1,
+            "createdAt": "2024-11-26T10:00:00",
+            "updatedAt": "2024-11-26T10:00:00",
+            "parentFolder": null,
+            "subFolders": [],
+            "files": [],
+            "creatorName": "张老师",
+            "fileCount": 0,
+            "folderCount": 0
+          }
+        }
+        ```
+
+    * 获取文件夹树形结构示例：
+        **请求:**
+        ```bash
+        GET /api/cloud/folders/1/tree
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 1,
+            "name": "第一章课件",
+            "path": "/",
+            "subFolders": [
+              {
+                "id": 2,
+                "name": "基础概念",
+                "path": "/第一章课件",
+                "subFolders": [
+                  {
+                    "id": 3,
+                    "name": "重点知识",
+                    "path": "/第一章课件/基础概念",
+                    "subFolders": [],
+                    "files": []
+                  }
+                ],
+                "files": []
+              }
+            ],
+            "files": [
+              {
+                "id": 1,
+                "fileName": "intro.pdf",
+                "originalFileName": "课程介绍.pdf",
+                "fileSize": 1024000
+              }
+            ]
+          }
+        }
+        ```
+
+    * 移动文件夹示例：
+        **请求:**
+        ```bash
+        PUT /api/cloud/folders/3/move?parentFolderId=1
+        Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+        ```
+
+        **响应:**
+        ```json
+        {
+          "code": 0,
+          "message": "操作成功",
+          "data": {
+            "id": 3,
+            "name": "重点知识",
+            "parentFolderId": 1,
+            "path": "/第一章课件",
+            "updatedAt": "2024-11-26T10:30:00"
           }
         }
         ```

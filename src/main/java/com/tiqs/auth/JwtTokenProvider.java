@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+/**
+ * JWT令牌提供者
+ * 负责JWT令牌的生成、解析和验证
+ * 
+ * @author EduSystemLoader
+ */
 @Component
 public class JwtTokenProvider {
 
