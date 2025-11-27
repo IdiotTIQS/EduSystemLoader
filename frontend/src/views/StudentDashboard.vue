@@ -314,10 +314,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
 
       <div v-if="toast.text" :class="['notification', toast.type]">{{ toast.text }}</div>
 
-      <div v-if="currentPage === 'classes'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'classes'" class="page-content" key="classes">
         <div class="card">
           <div class="section-title">
-            <h3>加入新班级</h3>
+            <h3>加入班级</h3>
           </div>
           <form class="form-grid" @submit.prevent="joinClass">
             <label>
@@ -347,9 +348,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             <p v-if="!state.joinedClasses.length" style="color: #94a3b8;">还未加入任何班级，先输入邀请码吧。</p>
           </div>
         </div>
-      </div>
+        </div>
+      </transition>
 
-      <div v-if="currentPage === 'courses'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'courses'" class="page-content" key="courses">
         <div class="card">
           <div class="section-title">
             <h3>课程信息</h3>
@@ -381,9 +384,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             </table>
           </div>
         </div>
-      </div>
+        </div>
+      </transition>
 
-      <div v-if="currentPage === 'assignments'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'assignments'" class="page-content" key="assignments">
         <div class="card">
           <div class="section-title">
             <h3>作业列表</h3>
@@ -453,9 +458,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             上次提交：{{ state.mySubmission.submittedAt || '未知时间' }}，评分 {{ state.mySubmission.score ?? '未评分' }}
           </p>
         </div>
-      </div>
+        </div>
+      </transition>
 
-      <div v-if="currentPage === 'class-members'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'class-members'" class="page-content" key="class-members">
         <div class="card">
           <div class="section-title">
             <h3>班级成员列表</h3>
@@ -495,9 +502,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             <button class="secondary" @click="switchPage('classes')">返回班级列表</button>
           </div>
         </div>
-      </div>
+        </div>
+      </transition>
 
-      <div v-if="currentPage === 'discussions'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'discussions'" class="page-content" key="discussions">
         <div v-if="!state.currentClassId" class="card">
           <div class="section-title">
             <h3>班级讨论</h3>
@@ -530,9 +539,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             @cancel="backToDiscussionList"
           />
         </div>
-      </div>
+        </div>
+      </transition>
 
-      <div v-if="currentPage === 'cloud-drive'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'cloud-drive'" class="page-content" key="cloud-drive">
         <div v-if="!state.currentClassId" class="card">
           <div class="section-title">
             <h3>班级云盘</h3>
@@ -546,9 +557,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
         <div v-else class="page-content">
           <CloudDrive :class-id="state.currentClassId" :is-teacher="false" />
         </div>
-      </div>
+        </div>
+      </transition>
 
-      <div v-if="currentPage === 'profile'" class="page-content">
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'profile'" class="page-content" key="profile">
         <div class="card">
           <div class="section-title">
             <h3>个人信息</h3>
@@ -573,7 +586,8 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
             </div>
           </form>
         </div>
-      </div>
+        </div>
+      </transition>
     </main>
   </section>
 </template>
@@ -595,6 +609,17 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(15, 23, 42, 0.05);
   flex-shrink: 0;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .sidebar-header {
@@ -663,6 +688,50 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* 页面过渡动画 */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.page-fade-enter-active .card,
+.page-fade-leave-active .card {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-enter-from .card {
+  transform: translateY(10px);
+}
+
+.page-fade-leave-to .card {
+  transform: translateY(-10px);
+}
+
+/* 确保主内容区域在动画期间保持稳定 */
+.main-content {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
 }
 
 @media (max-width: 768px) {

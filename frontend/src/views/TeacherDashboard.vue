@@ -1144,6 +1144,8 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 /* 提交管理相关样式 */
@@ -1339,6 +1341,11 @@ watch(
 .page-fade-enter-active,
 .page-fade-leave-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
 }
 
 .page-fade-enter-from {
@@ -1362,6 +1369,14 @@ watch(
 
 .page-fade-leave-to .card {
   transform: translateY(-10px);
+}
+
+/* 确保主内容区域在动画期间保持稳定 */
+.main-content {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
 }
 
 @media (max-width: 768px) {
