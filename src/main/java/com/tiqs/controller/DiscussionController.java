@@ -5,12 +5,13 @@ import com.tiqs.auth.RequireRole;
 import com.tiqs.auth.UserRole;
 import com.tiqs.common.ApiResponse;
 import com.tiqs.common.BusinessException;
-import com.tiqs.entity.Discussion;
 import com.tiqs.entity.Comment;
-import com.tiqs.service.DiscussionService;
+import com.tiqs.entity.Discussion;
 import com.tiqs.service.CommentService;
+import com.tiqs.service.DiscussionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @Slf4j
@@ -19,7 +20,7 @@ import java.util.List;
 public class DiscussionController {
     private final DiscussionService discussionService;
     private final CommentService commentService;
-    
+
     public DiscussionController(DiscussionService discussionService, CommentService commentService) {
         this.discussionService = discussionService;
         this.commentService = commentService;
@@ -27,7 +28,7 @@ public class DiscussionController {
 
     @PostMapping
     public ApiResponse<Discussion> create(@RequestBody Discussion discussion) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         discussion.setAuthorId(userId);
         log.info("请求创建讨论 classId={} title={}", discussion.getClassId(), discussion.getTitle());
         return ApiResponse.ok(discussionService.create(discussion));
@@ -49,7 +50,7 @@ public class DiscussionController {
 
     @PutMapping("/{id}")
     public ApiResponse<Discussion> update(@PathVariable Long id, @RequestBody Discussion discussion) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         Discussion existing = discussionService.get(id);
         if (!existing.getAuthorId().equals(userId)) {
             throw BusinessException.of(403, "无权限修改此讨论");
@@ -62,7 +63,7 @@ public class DiscussionController {
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> delete(@PathVariable Long id) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         log.warn("删除讨论 id={} userId={}", id, userId);
         discussionService.delete(id, userId);
         return ApiResponse.ok(null);
@@ -71,14 +72,14 @@ public class DiscussionController {
     @RequireRole(UserRole.TEACHER)
     @PutMapping("/{id}/pin")
     public ApiResponse<Discussion> updatePinnedStatus(@PathVariable Long id, @RequestParam Boolean isPinned) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         log.info("更新讨论置顶状态 id={} isPinned={} userId={}", id, isPinned, userId);
         return ApiResponse.ok(discussionService.updatePinnedStatus(id, isPinned, userId));
     }
 
     @PostMapping("/{discussionId}/comments")
     public ApiResponse<Comment> createComment(@PathVariable Long discussionId, @RequestBody Comment comment) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         comment.setDiscussionId(discussionId);
         comment.setAuthorId(userId);
         log.info("请求创建评论 discussionId={} content={}", discussionId, comment.getContent().substring(0, Math.min(50, comment.getContent().length())));
@@ -93,7 +94,7 @@ public class DiscussionController {
 
     @PutMapping("/comments/{id}")
     public ApiResponse<Comment> updateComment(@PathVariable Long id, @RequestBody Comment comment) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         comment.setId(id);
         comment.setAuthorId(userId);
         log.info("更新评论 id={} userId={}", id, userId);
@@ -102,7 +103,7 @@ public class DiscussionController {
 
     @DeleteMapping("/comments/{id}")
     public ApiResponse<Void> deleteComment(@PathVariable Long id) {
-        Long userId = AuthContextHolder.get().getUserId();
+        Long userId = AuthContextHolder.get().userId();
         log.warn("删除评论 id={} userId={}", id, userId);
         commentService.delete(id, userId);
         return ApiResponse.ok(null);

@@ -8,6 +8,7 @@ import com.tiqs.service.DiscussionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Slf4j
@@ -16,12 +17,12 @@ import java.util.List;
 public class DiscussionServiceImpl implements DiscussionService {
     private final DiscussionMapper discussionMapper;
     private final ClassMapper classMapper;
-    
+
     public DiscussionServiceImpl(DiscussionMapper discussionMapper, ClassMapper classMapper) {
         this.discussionMapper = discussionMapper;
         this.classMapper = classMapper;
     }
-    
+
     @Transactional
     public Discussion create(Discussion discussion) {
         discussion.setViewCount(0);
@@ -30,12 +31,12 @@ public class DiscussionServiceImpl implements DiscussionService {
         log.info("创建讨论成功 id={} classId={} title={}", discussion.getId(), discussion.getClassId(), discussion.getTitle());
         return discussion;
     }
-    
+
     public List<Discussion> listByClass(Long classId) {
         log.debug("查询班级讨论列表 classId={}", classId);
         return discussionMapper.findByClassId(classId);
     }
-    
+
     public Discussion get(Long id) {
         Discussion discussion = discussionMapper.findById(id);
         if (discussion == null) {
@@ -44,7 +45,7 @@ public class DiscussionServiceImpl implements DiscussionService {
         }
         return discussion;
     }
-    
+
     @Transactional
     public Discussion update(Discussion discussion) {
         Discussion existing = discussionMapper.findById(discussion.getId());
@@ -56,7 +57,7 @@ public class DiscussionServiceImpl implements DiscussionService {
         log.info("更新讨论成功 id={} title={}", discussion.getId(), discussion.getTitle());
         return discussionMapper.findById(discussion.getId());
     }
-    
+
     @Transactional
     public void delete(Long id, Long userId) {
         Discussion discussion = discussionMapper.findById(id);
@@ -71,12 +72,12 @@ public class DiscussionServiceImpl implements DiscussionService {
         discussionMapper.delete(id);
         log.info("删除讨论成功 id={}", id);
     }
-    
+
     @Transactional
     public void incrementViewCount(Long id) {
         discussionMapper.incrementViewCount(id);
     }
-    
+
     @Transactional
     public Discussion updatePinnedStatus(Long id, Boolean isPinned, Long userId) {
         Discussion discussion = discussionMapper.findById(id);

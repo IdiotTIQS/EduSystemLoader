@@ -1,12 +1,7 @@
 package com.tiqs.auth;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
 @AllArgsConstructor
-public class AuthContext {
-    private final Long userId;
-    private final String username;
-    private final UserRole role;
+public record AuthContext(Long userId, String username, UserRole role) {
 }

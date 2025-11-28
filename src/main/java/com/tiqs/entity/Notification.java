@@ -1,8 +1,8 @@
 package com.tiqs.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -18,20 +18,20 @@ public class Notification {
     private Boolean isRead;
     private LocalDateTime createdAt;
     private LocalDateTime readAt;
-    
+
     public enum NotificationType {
         ASSIGNMENT("作业通知"),
         COURSE("课程通知"),
         ENROLLMENT("选课通知"),
         GRADE("成绩通知"),
         SYSTEM("系统通知");
-        
+
         private final String description;
-        
+
         NotificationType(String description) {
             this.description = description;
         }
-        
+
         public String getDescription() {
             return description;
         }

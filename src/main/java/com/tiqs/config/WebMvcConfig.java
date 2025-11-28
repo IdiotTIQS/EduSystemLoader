@@ -35,7 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(false)
                 .maxAge(3600);
-        
+
         // 为文件上传路径添加CORS支持
         registry.addMapping("/uploads/**")
                 .allowedOrigins("http://localhost:3000", "http://localhost:5173")

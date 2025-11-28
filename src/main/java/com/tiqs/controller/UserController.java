@@ -3,19 +3,12 @@ package com.tiqs.controller;
 import com.tiqs.auth.AuthContext;
 import com.tiqs.auth.AuthContextHolder;
 import com.tiqs.auth.AuthException;
-import com.tiqs.auth.RequireRole;
-import com.tiqs.auth.UserRole;
 import com.tiqs.common.ApiResponse;
 import com.tiqs.dto.ProfileRequest;
 import com.tiqs.entity.UserProfile;
 import com.tiqs.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,7 +19,7 @@ public class UserController {
     @GetMapping("/profile")
     public ApiResponse<UserProfile> profile() {
         AuthContext auth = requireAuth();
-        return ApiResponse.ok(userService.loadProfile(auth.getUserId()));
+        return ApiResponse.ok(userService.loadProfile(auth.userId()));
     }
 
     @GetMapping("/{userId}/profile")
@@ -38,7 +31,7 @@ public class UserController {
     @PutMapping("/profile")
     public ApiResponse<UserProfile> update(@RequestBody ProfileRequest request) {
         AuthContext auth = requireAuth();
-        return ApiResponse.ok(userService.updateProfile(auth.getUserId(), request));
+        return ApiResponse.ok(userService.updateProfile(auth.userId(), request));
     }
 
     private AuthContext requireAuth() {

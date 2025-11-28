@@ -1,8 +1,8 @@
 package com.tiqs.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +18,7 @@ public class Comment {
     private Boolean isEdited;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     private String authorName;
     private String authorRole;
 }

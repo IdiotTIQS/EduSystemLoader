@@ -1,6 +1,7 @@
 package com.tiqs.entity;
 
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data

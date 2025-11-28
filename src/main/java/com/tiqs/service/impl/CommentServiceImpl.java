@@ -7,6 +7,7 @@ import com.tiqs.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Slf4j
@@ -14,11 +15,11 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
-    
+
     public CommentServiceImpl(CommentMapper commentMapper) {
         this.commentMapper = commentMapper;
     }
-    
+
     @Transactional
     public Comment create(Comment comment) {
         comment.setIsEdited(false);
@@ -26,12 +27,12 @@ public class CommentServiceImpl implements CommentService {
         log.info("创建评论成功 id={} discussionId={} authorId={}", comment.getId(), comment.getDiscussionId(), comment.getAuthorId());
         return comment;
     }
-    
+
     public List<Comment> listByDiscussion(Long discussionId) {
         log.debug("查询讨论评论列表 discussionId={}", discussionId);
         return commentMapper.findByDiscussionId(discussionId);
     }
-    
+
     @Transactional
     public Comment update(Comment comment) {
         Comment existing = commentMapper.findById(comment.getId());
@@ -47,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
         log.info("更新评论成功 id={}", comment.getId());
         return commentMapper.findById(comment.getId());
     }
-    
+
     @Transactional
     public void delete(Long id, Long userId) {
         Comment comment = commentMapper.findById(id);
@@ -62,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
         commentMapper.delete(id);
         log.info("删除评论成功 id={}", id);
     }
-    
+
     @Transactional
     public void deleteByDiscussion(Long discussionId) {
         commentMapper.deleteByDiscussionId(discussionId);

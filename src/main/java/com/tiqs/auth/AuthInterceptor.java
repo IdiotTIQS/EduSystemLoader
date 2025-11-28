@@ -27,24 +27,24 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (WHITE_LIST.contains(path)) {
             return true;
         }
-        
+
         String authHeader = request.getHeader(HEADER_AUTHORIZATION);
         if (!StringUtils.hasText(authHeader)) {
             throw new AuthException("缺少认证头: Authorization");
         }
-        
+
         String token = jwtTokenProvider.extractTokenFromBearer(authHeader);
         if (token == null || !jwtTokenProvider.validateToken(token)) {
             throw new AuthException("无效的认证令牌");
         }
-        
+
         AuthContext authContext = jwtTokenProvider.getAuthContextFromToken(token);
         AuthContextHolder.set(authContext);
 
         if (handler instanceof HandlerMethod handlerMethod) {
             RequireRole requireRole = resolveAnnotation(handlerMethod);
             if (requireRole != null && requireRole.value().length > 0) {
-                boolean allowed = Arrays.stream(requireRole.value()).anyMatch(r -> r == authContext.getRole());
+                boolean allowed = Arrays.stream(requireRole.value()).anyMatch(r -> r == authContext.role());
                 if (!allowed) {
                     throw new AuthException("当前角色无权访问该接口");
                 }
@@ -58,7 +58,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         AuthContextHolder.clear();
     }
 
-    
 
     private RequireRole resolveAnnotation(HandlerMethod handlerMethod) {
         RequireRole method = handlerMethod.getMethodAnnotation(RequireRole.class);

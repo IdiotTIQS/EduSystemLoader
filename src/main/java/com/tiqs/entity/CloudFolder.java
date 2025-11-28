@@ -1,8 +1,8 @@
 package com.tiqs.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +19,7 @@ public class CloudFolder {
     private Long creatorId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     // 关联属性
     private CloudFolder parentFolder;
     private List<CloudFolder> subFolders;
@@ -27,7 +27,7 @@ public class CloudFolder {
     private String creatorName;
     private Integer fileCount;
     private Integer folderCount;
-    
+
     public CloudFolder(Long classId, String name, Long parentFolderId, String path, Long creatorId) {
         this.classId = classId;
         this.name = name;
@@ -35,11 +35,11 @@ public class CloudFolder {
         this.path = path;
         this.creatorId = creatorId;
     }
-    
+
     public boolean isRoot() {
         return parentFolderId == null;
     }
-    
+
     public String getFullPath() {
         if (isRoot()) {
             return "/" + name;

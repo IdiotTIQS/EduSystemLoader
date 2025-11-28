@@ -8,7 +8,10 @@ import com.tiqs.entity.UserProfile;
 
 public interface UserService {
     AuthResponse register(RegisterRequest request);
+
     AuthResponse login(AuthRequest request);
+
     UserProfile loadProfile(Long userId);
+
     UserProfile updateProfile(Long userId, ProfileRequest request);
 }

@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 用户服务实现类
- * 
+ *
  * @author EduSystemLoader
  */
 @Service
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
                 UserRole.valueOf(user.getRole())
         );
         String token = jwtTokenProvider.generateToken(authContext);
-        
+
         return AuthResponse.builder()
                 .userId(user.getId())
                 .username(user.getUsername())

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 认证控制器
  * 处理用户注册、登录等认证相关操作
- * 
+ *
  * @author EduSystemLoader
  */
 @RestController
@@ -25,7 +25,7 @@ public class AuthController {
 
     /**
      * 用户注册
-     * 
+     *
      * @param request 注册请求信息
      * @return 认证响应信息
      */
@@ -36,7 +36,7 @@ public class AuthController {
 
     /**
      * 用户登录
-     * 
+     *
      * @param request 登录请求信息
      * @return 认证响应信息
      */

@@ -1,6 +1,8 @@
 package com.tiqs.auth;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,7 @@ import java.util.Date;
 /**
  * JWT令牌提供者
  * 负责JWT令牌的生成、解析和验证
- * 
+ *
  * @author EduSystemLoader
  */
 @Component
@@ -32,9 +34,9 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .subject(authContext.getUserId().toString())
-                .claim("role", authContext.getRole())
-                .claim("username", authContext.getUsername())
+                .subject(authContext.userId().toString())
+                .claim("role", authContext.role())
+                .claim("username", authContext.username())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
@@ -58,9 +60,9 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token);
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;

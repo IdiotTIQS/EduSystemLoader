@@ -2,6 +2,7 @@ package com.tiqs.mapper;
 
 import com.tiqs.entity.Submission;
 import org.apache.ibatis.annotations.*;
+
 import java.util.List;
 
 @Mapper
@@ -11,7 +12,7 @@ public interface SubmissionMapper {
     int insert(Submission s);
 
     @Select("SELECT id,assignment_id AS assignmentId,student_id AS studentId,file_path AS filePath,original_file_name AS originalFileName,answer_text AS answerText,submitted_at AS submittedAt,score,feedback,graded_at AS gradedAt,status FROM submissions WHERE assignment_id=#{assignmentId} AND student_id=#{studentId}")
-    Submission findUnique(@Param("assignmentId") Long assignmentId,@Param("studentId") Long studentId);
+    Submission findUnique(@Param("assignmentId") Long assignmentId, @Param("studentId") Long studentId);
 
     @Select("SELECT id,assignment_id AS assignmentId,student_id AS studentId,file_path AS filePath,original_file_name AS originalFileName,answer_text AS answerText,submitted_at AS submittedAt,score,feedback,graded_at AS gradedAt,status FROM submissions WHERE assignment_id=#{assignmentId}")
     List<Submission> findByAssignment(Long assignmentId);

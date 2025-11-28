@@ -2,6 +2,7 @@ package com.tiqs.mapper;
 
 import com.tiqs.entity.CloudFile;
 import org.apache.ibatis.annotations.*;
+
 import java.util.List;
 
 @Mapper
@@ -73,7 +74,7 @@ public interface CloudFileMapper {
 
     @Select("SELECT COUNT(*) FROM cloud_files WHERE class_id = #{classId}")
     Integer getFileCountByClassId(Long classId);
-    
+
     @Select("SELECT f.id, f.class_id AS classId, f.file_name AS fileName, f.original_file_name AS originalFileName, " +
             "f.file_path AS filePath, f.file_size AS fileSize, f.file_type AS fileType, f.description, " +
             "f.uploader_id AS uploaderId, f.download_count AS downloadCount, f.is_public AS isPublic, " +
@@ -86,10 +87,10 @@ public interface CloudFileMapper {
             "WHERE f.folder_id = #{folderId} " +
             "ORDER BY f.created_at DESC")
     List<CloudFile> findByFolderId(@Param("folderId") Long folderId);
-    
+
     @Delete("DELETE FROM cloud_files WHERE folder_id = #{folderId}")
     int deleteByFolderId(@Param("folderId") Long folderId);
-    
+
     @Update("UPDATE cloud_files SET folder_id = #{folderId} WHERE id = #{fileId}")
     int moveFile(@Param("fileId") Long fileId, @Param("folderId") Long folderId);
 }

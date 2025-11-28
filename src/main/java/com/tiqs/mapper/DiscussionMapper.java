@@ -2,6 +2,7 @@ package com.tiqs.mapper;
 
 import com.tiqs.entity.Discussion;
 import org.apache.ibatis.annotations.*;
+
 import java.util.List;
 
 @Mapper

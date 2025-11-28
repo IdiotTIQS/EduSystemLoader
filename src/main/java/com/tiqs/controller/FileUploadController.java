@@ -32,11 +32,11 @@ public class FileUploadController {
     @PostMapping("/file")
     public ApiResponse<String> uploadFile(@RequestParam("file") MultipartFile file) {
         requireAuth();
-        
+
         if (file.isEmpty()) {
             throw new IllegalArgumentException("请选择要上传的文件");
         }
-        
+
         // 检查文件大小 (100MB)
         if (file.getSize() > 100 * 1024 * 1024) {
             throw new IllegalArgumentException("文件大小超出限制，请选择小于100MB的文件");
@@ -47,14 +47,14 @@ public class FileUploadController {
             String originalFilename = file.getOriginalFilename();
             if (originalFilename != null) {
                 String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
-                
+
                 // 禁止的可执行文件和SQL文件扩展名
                 String[] forbiddenExtensions = {
-                    ".exe", ".bat", ".sh", ".cmd", ".com", ".scr", ".msi",
-                    ".sql", ".ddl", ".dml", ".pl", ".php", ".asp", ".jsp",
-                    ".js", ".vbs", ".py", ".rb", ".ps1", ".bash", ".zsh"
+                        ".exe", ".bat", ".sh", ".cmd", ".com", ".scr", ".msi",
+                        ".sql", ".ddl", ".dml", ".pl", ".php", ".asp", ".jsp",
+                        ".js", ".vbs", ".py", ".rb", ".ps1", ".bash", ".zsh"
                 };
-                
+
                 for (String ext : forbiddenExtensions) {
                     if (fileExtension.equals(ext)) {
                         throw new IllegalArgumentException("不支持上传该类型的文件: " + fileExtension);
@@ -73,9 +73,9 @@ public class FileUploadController {
             if (originalFilename != null && originalFilename.contains(".")) {
                 fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
-            
-            String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
-            
+
+            String uniqueFilename = UUID.randomUUID() + fileExtension;
+
             // 按日期创建子目录
             String datePath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
             Path dateDir = uploadPath.resolve(datePath);
