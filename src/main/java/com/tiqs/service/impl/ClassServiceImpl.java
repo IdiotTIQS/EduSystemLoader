@@ -26,21 +26,23 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Transactional
+    @Override
     public ClassEntity create(ClassEntity cls) {
         classMapper.insert(cls);
         log.info("创建班级成功 id={} code={}", cls.getId(), cls.getCode());
         return cls;
     }
-
+    @Override
     public List<ClassEntity> listByTeacher(Long teacherId) {
         log.debug("按教师查询班级 teacherId={}", teacherId);
         return classMapper.findByTeacher(teacherId);
     }
 
+    @Override
     public ClassEntity get(Long id) {
         return classMapper.findById(id);
     }
-
+    @Override
     @Transactional
     public ClassEntity updateName(Long id, String name) {
         ClassEntity c = classMapper.findById(id);
@@ -55,11 +57,12 @@ public class ClassServiceImpl implements ClassService {
     }
 
     @Transactional
+    @Override
     public void delete(Long id) {
         classMapper.delete(id);
         log.info("删除班级成功 id={}", id);
     }
-
+    @Override
     public ClassEntity findByCode(String code) {
         ClassEntity cls = classMapper.findByCode(code);
         if (cls == null) {

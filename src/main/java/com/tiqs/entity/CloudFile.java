@@ -36,55 +36,75 @@ public class CloudFile {
     private String folderName;
 
     public String getFormattedFileSize() {
-        if (fileSize == null) return "0 B";
+        if (fileSize == null) {
+            return "0 B";
+        }
 
         long size = fileSize;
-        if (size < 1024) return size + " B";
-        if (size < 1024 * 1024) return String.format("%.1f KB", size / 1024.0);
-        if (size < 1024 * 1024 * 1024) return String.format("%.1f MB", size / (1024.0 * 1024));
+        if (size < 1024) {
+            return size + " B";
+        }
+        if (size < 1024 * 1024) {
+            return String.format("%.1f KB", size / 1024.0);
+        }
+        if (size < 1024 * 1024 * 1024) {
+            return String.format("%.1f MB", size / (1024.0 * 1024));
+        }
         return String.format("%.1f GB", size / (1024.0 * 1024 * 1024));
     }
 
     public String getFileExtension() {
-        if (fileName == null || !fileName.contains(".")) return "";
+        if (fileName == null || !fileName.contains(".")) {
+            return "";
+        }
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
     public boolean isImage() {
         String ext = getFileExtension();
-        return ext.equals("jpg") || ext.equals("jpeg") || ext.equals("png") ||
-                ext.equals("gif") || ext.equals("bmp") || ext.equals("webp");
+        return "jpg".equals(ext) || "jpeg".equals(ext) || "png".equals(ext) ||
+                "gif".equals(ext) || "bmp".equals(ext) || "webp".equals(ext);
     }
 
     public boolean isDocument() {
         String ext = getFileExtension();
-        return ext.equals("pdf") || ext.equals("doc") || ext.equals("docx") ||
-                ext.equals("txt") || ext.equals("rtf") || ext.equals("odt");
+        return "pdf".equals(ext) || "doc".equals(ext) || "docx".equals(ext) ||
+                "txt".equals(ext) || "rtf".equals(ext) || "odt".equals(ext);
     }
 
     public boolean isSpreadsheet() {
         String ext = getFileExtension();
-        return ext.equals("xls") || ext.equals("xlsx") || ext.equals("csv") ||
-                ext.equals("ods");
+        return "xls".equals(ext) || "xlsx".equals(ext) || "csv".equals(ext) ||
+                "ods".equals(ext);
     }
 
     public boolean isPresentation() {
         String ext = getFileExtension();
-        return ext.equals("ppt") || ext.equals("pptx") || ext.equals("odp");
+        return "ppt".equals(ext) || "pptx".equals(ext) || "odp".equals(ext);
     }
 
     public boolean isArchive() {
         String ext = getFileExtension();
-        return ext.equals("zip") || ext.equals("rar") || ext.equals("7z") ||
-                ext.equals("tar") || ext.equals("gz");
+        return "zip".equals(ext) || "rar".equals(ext) || "7z".equals(ext) ||
+                "tar".equals(ext) || "gz".equals(ext);
     }
 
     public String getFileCategory() {
-        if (isImage()) return "图片";
-        if (isDocument()) return "文档";
-        if (isSpreadsheet()) return "表格";
-        if (isPresentation()) return "演示文稿";
-        if (isArchive()) return "压缩包";
+        if (isImage()) {
+            return "图片";
+        }
+        if (isDocument()) {
+            return "文档";
+        }
+        if (isSpreadsheet()) {
+            return "表格";
+        }
+        if (isPresentation()) {
+            return "演示文稿";
+        }
+        if (isArchive()) {
+            return "压缩包";
+        }
         return "其他";
     }
 }

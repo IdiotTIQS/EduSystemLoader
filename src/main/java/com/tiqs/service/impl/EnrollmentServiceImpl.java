@@ -25,6 +25,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Transactional
+    @Override
     public Enrollment enroll(Long classId, Long studentId) {
         Enrollment existing = enrollmentMapper.findUnique(classId, studentId);
         if (existing != null) {
@@ -38,11 +39,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         log.info("学生加入班级成功 studentId={} classId={}", studentId, classId);
         return e;
     }
-
+    @Override
     public List<Enrollment> listByClass(Long classId) {
         return enrollmentMapper.findByClass(classId);
     }
-
+    @Override
     public Enrollment findUnique(Long classId, Long studentId) {
         return enrollmentMapper.findUnique(classId, studentId);
     }

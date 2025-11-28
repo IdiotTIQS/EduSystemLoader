@@ -26,19 +26,21 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Transactional
+    @Override
     public Comment create(Comment comment) {
         comment.setIsEdited(false);
         commentMapper.insert(comment);
         log.info("创建评论成功 id={} discussionId={} authorId={}", comment.getId(), comment.getDiscussionId(), comment.getAuthorId());
         return comment;
     }
-
+    @Override
     public List<Comment> listByDiscussion(Long discussionId) {
         log.debug("查询讨论评论列表 discussionId={}", discussionId);
         return commentMapper.findByDiscussionId(discussionId);
     }
 
     @Transactional
+    @Override
     public Comment update(Comment comment) {
         Comment existing = commentMapper.findById(comment.getId());
         if (existing == null) {
@@ -55,6 +57,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Transactional
+    @Override
     public void delete(Long id, Long userId) {
         Comment comment = commentMapper.findById(id);
         if (comment == null) {
@@ -70,6 +73,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Transactional
+    @Override
     public void deleteByDiscussion(Long discussionId) {
         commentMapper.deleteByDiscussionId(discussionId);
         log.info("删除讨论下的所有评论 discussionId={}", discussionId);

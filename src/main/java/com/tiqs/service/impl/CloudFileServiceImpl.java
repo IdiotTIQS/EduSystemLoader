@@ -40,6 +40,7 @@ public class CloudFileServiceImpl implements CloudFileService {
     }
 
     @Transactional
+    @Override
     public CloudFile uploadFile(Long classId, Long uploaderId, MultipartFile file, String description, Boolean isPublic, Long folderId) {
         if (file.isEmpty()) {
             throw BusinessException.of(400, "文件不能为空");
@@ -102,22 +103,23 @@ public class CloudFileServiceImpl implements CloudFileService {
             throw BusinessException.of(500, "文件上传失败：" + e.getMessage());
         }
     }
-
+    @Override
     public List<CloudFile> listByClass(Long classId) {
         log.debug("查询班级云盘文件 classId={}", classId);
         return cloudFileMapper.findByClassId(classId);
     }
 
+    @Override
     public List<CloudFile> listByClassAndFileType(Long classId, String fileType) {
         log.debug("按文件类型查询班级云盘文件 classId={} fileType={}", classId, fileType);
         return cloudFileMapper.findByClassIdAndFileType(classId, fileType);
     }
-
+    @Override
     public List<CloudFile> listByClassAndUploader(Long classId, Long uploaderId) {
         log.debug("查询用户上传的班级云盘文件 classId={} uploaderId={}", classId, uploaderId);
         return cloudFileMapper.findByClassIdAndUploader(classId, uploaderId);
     }
-
+    @Override
     public CloudFile get(Long id) {
         CloudFile cloudFile = cloudFileMapper.findById(id);
         if (cloudFile == null) {
@@ -126,7 +128,7 @@ public class CloudFileServiceImpl implements CloudFileService {
         }
         return cloudFile;
     }
-
+    @Override
     @Transactional
     public CloudFile update(CloudFile cloudFile, Long userId) {
         CloudFile existing = cloudFileMapper.findById(cloudFile.getId());
@@ -145,7 +147,7 @@ public class CloudFileServiceImpl implements CloudFileService {
         log.info("更新云盘文件成功 id={} userId={}", cloudFile.getId(), userId);
         return cloudFileMapper.findById(cloudFile.getId());
     }
-
+    @Override
     @Transactional
     public void delete(Long id, Long userId) {
         CloudFile cloudFile = cloudFileMapper.findById(id);
@@ -174,11 +176,13 @@ public class CloudFileServiceImpl implements CloudFileService {
         log.info("删除云盘文件成功 id={} userId={}", id, userId);
     }
 
-    @Transactional(readOnly = false)
+    @Override
+    @Transactional()
     public void incrementDownloadCount(Long id) {
         cloudFileMapper.incrementDownloadCount(id);
     }
 
+    @Override
     public byte[] downloadFile(Long id, Long userId) {
         CloudFile cloudFile = get(id);
 
@@ -214,7 +218,7 @@ public class CloudFileServiceImpl implements CloudFileService {
     public void incrementDownloadCountInNewTransaction(Long id) {
         cloudFileMapper.incrementDownloadCount(id);
     }
-
+    @Override
     public CloudFileStatistics getStatistics(Long classId) {
         Long totalSize = cloudFileMapper.getTotalSizeByClassId(classId);
         Integer fileCount = cloudFileMapper.getFileCountByClassId(classId);

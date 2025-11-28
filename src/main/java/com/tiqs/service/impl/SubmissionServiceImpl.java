@@ -25,21 +25,23 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Transactional
+    @Override
     public Submission submit(Submission s) {
         submissionMapper.insert(s);
         log.info("提交作业成功 assignmentId={} studentId={}", s.getAssignmentId(), s.getStudentId());
         return submissionMapper.findUnique(s.getAssignmentId(), s.getStudentId());
     }
-
+    @Override
     public Submission findUnique(Long assignmentId, Long studentId) {
         return submissionMapper.findUnique(assignmentId, studentId);
     }
-
+    @Override
     public List<Submission> listByAssignment(Long assignmentId) {
         return submissionMapper.findByAssignment(assignmentId);
     }
 
     @Transactional
+    @Override
     public Submission updateContent(Long id, String filePath, String answerText, String originalFileName) {
         Submission s = new Submission();
         s.setId(id);
@@ -52,6 +54,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     }
 
     @Transactional
+    @Override
     public Submission grade(Long id, Double score, String feedback) {
         Submission s = new Submission();
         s.setId(id);

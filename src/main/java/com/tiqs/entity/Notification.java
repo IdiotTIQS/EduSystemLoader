@@ -7,6 +7,7 @@ package com.tiqs.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class Notification {
     private LocalDateTime createdAt;
     private LocalDateTime readAt;
 
+    @Getter
     public enum NotificationType {
         ASSIGNMENT("作业通知"),
         COURSE("课程通知"),
@@ -37,8 +39,5 @@ public class Notification {
             this.description = description;
         }
 
-        public String getDescription() {
-            return description;
-        }
     }
 }

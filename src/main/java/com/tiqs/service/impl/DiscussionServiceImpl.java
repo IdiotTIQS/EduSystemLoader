@@ -29,6 +29,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Transactional
+    @Override
     public Discussion create(Discussion discussion) {
         discussion.setViewCount(0);
         discussion.setIsPinned(false);
@@ -36,12 +37,12 @@ public class DiscussionServiceImpl implements DiscussionService {
         log.info("创建讨论成功 id={} classId={} title={}", discussion.getId(), discussion.getClassId(), discussion.getTitle());
         return discussion;
     }
-
+    @Override
     public List<Discussion> listByClass(Long classId) {
         log.debug("查询班级讨论列表 classId={}", classId);
         return discussionMapper.findByClassId(classId);
     }
-
+    @Override
     public Discussion get(Long id) {
         Discussion discussion = discussionMapper.findById(id);
         if (discussion == null) {
@@ -52,6 +53,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Transactional
+    @Override
     public Discussion update(Discussion discussion) {
         Discussion existing = discussionMapper.findById(discussion.getId());
         if (existing == null) {
@@ -64,6 +66,7 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Transactional
+    @Override
     public void delete(Long id, Long userId) {
         Discussion discussion = discussionMapper.findById(id);
         if (discussion == null) {
@@ -79,11 +82,13 @@ public class DiscussionServiceImpl implements DiscussionService {
     }
 
     @Transactional
+    @Override
     public void incrementViewCount(Long id) {
         discussionMapper.incrementViewCount(id);
     }
 
     @Transactional
+    @Override
     public Discussion updatePinnedStatus(Long id, Boolean isPinned, Long userId) {
         Discussion discussion = discussionMapper.findById(id);
         if (discussion == null) {

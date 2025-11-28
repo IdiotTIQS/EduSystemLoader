@@ -25,20 +25,21 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Transactional
+    @Override
     public Course create(Course c) {
         courseMapper.insert(c);
         log.info("创建课程成功 id={} 标题={}", c.getId(), c.getTitle());
         return c;
     }
-
+    @Override
     public List<Course> listByClass(Long classId) {
         return courseMapper.findByClass(classId);
     }
-
+    @Override
     public Course get(Long id) {
         return courseMapper.findById(id);
     }
-
+    @Override
     @Transactional
     public Course update(Long id, String title, String description) {
         Course c = courseMapper.findById(id);
@@ -52,7 +53,7 @@ public class CourseServiceImpl implements CourseService {
         log.info("更新课程成功 id={}", id);
         return c;
     }
-
+    @Override
     @Transactional
     public void delete(Long id) {
         courseMapper.delete(id);

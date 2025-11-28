@@ -25,27 +25,28 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Transactional
+    @Override
     public Assignment create(Assignment a) {
         assignmentMapper.insert(a);
         log.info("创建作业成功 id={} 课程={}", a.getId(), a.getCourseId());
         return a;
     }
-
+    @Override
     public List<Assignment> listByCourse(Long courseId) {
         return assignmentMapper.findByCourse(courseId);
     }
-
+    @Override
     public Assignment get(Long id) {
         return assignmentMapper.findById(id);
     }
-
+    @Override
     @Transactional
     public Assignment update(Assignment a) {
         assignmentMapper.update(a);
         log.info("更新作业成功 id={}", a.getId());
         return assignmentMapper.findById(a.getId());
     }
-
+    @Override
     @Transactional
     public void delete(Long id) {
         assignmentMapper.delete(id);
