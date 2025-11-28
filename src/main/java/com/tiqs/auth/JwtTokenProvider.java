@@ -11,10 +11,9 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 
 /**
- * JWT令牌提供者
- * 负责JWT令牌的生成、解析和验证
- *
  * @author TIQS
+ * @date Created in 2025-11-28 14:48:12
+ * @description JwtTokenProvider
  */
 @Component
 public class JwtTokenProvider {

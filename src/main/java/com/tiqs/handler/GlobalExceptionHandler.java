@@ -1,3 +1,8 @@
+/**
+ * @author TIQS
+ * @date Created in 2025-11-28 14:50:16
+ * @description GlobalExceptionHandler
+ */
 package com.tiqs.handler;
 
 import com.tiqs.auth.AuthException;

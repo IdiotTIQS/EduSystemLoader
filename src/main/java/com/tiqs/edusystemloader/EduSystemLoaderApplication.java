@@ -1,3 +1,8 @@
+/**
+ * @author TIQS
+ * @date Created in 2025-11-28 14:50:16
+ * @description EduSystemLoaderApplication
+ */
 package com.tiqs.edusystemloader;
 
 import org.mybatis.spring.annotation.MapperScan;

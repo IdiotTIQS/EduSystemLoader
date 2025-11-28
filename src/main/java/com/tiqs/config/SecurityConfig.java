@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Spring Security配置类
- *
  * @author TIQS
+ * @date Created in 2025-11-28 14:48:12
+ * @description SecurityConfig
  */
 @Configuration
 public class SecurityConfig {

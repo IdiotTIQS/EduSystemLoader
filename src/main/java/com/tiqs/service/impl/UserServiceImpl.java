@@ -20,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 /**
- * 用户服务实现类
- *
  * @author TIQS
+ * @date Created in 2025-11-28 14:48:12
+ * @description UserServiceImpl
  */
 @Service
 @RequiredArgsConstructor

@@ -5,9 +5,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 用户实体类
- *
  * @author TIQS
+ * @date Created in 2025-11-28 14:48:12
+ * @description User
  */
 @Data
 public class User {

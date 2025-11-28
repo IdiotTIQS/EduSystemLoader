@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 认证控制器
- * 处理用户注册、登录等认证相关操作
- *
  * @author TIQS
+ * @date Created in 2025-11-28 14:48:12
+ * @description AuthController
  */
 @RestController
 @RequestMapping("/api/auth")
