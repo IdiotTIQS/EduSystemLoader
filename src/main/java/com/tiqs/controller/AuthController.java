@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 认证控制器
  * 处理用户注册、登录等认证相关操作
  *
- * @author EduSystemLoader
+ * @author TIQS
  */
 @RestController
 @RequestMapping("/api/auth")

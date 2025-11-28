@@ -7,7 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 /**
  * Spring Security配置类
  *
- * @author EduSystemLoader
+ * @author TIQS
  */
 @Configuration
 public class SecurityConfig {

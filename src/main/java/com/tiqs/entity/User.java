@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 /**
  * 用户实体类
  *
- * @author EduSystemLoader
+ * @author TIQS
  */
 @Data
 public class User {
