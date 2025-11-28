@@ -32,36 +32,15 @@ public interface CloudFolderService {
 
     CloudFolderStatistics getStatistics(Long classId);
 
-    class CloudFolderStatistics {
-        private final Long totalSize;
-        private final Integer fileCount;
-        private final Integer folderCount;
-
-        public CloudFolderStatistics(Long totalSize, Integer fileCount, Integer folderCount) {
-            this.totalSize = totalSize;
-            this.fileCount = fileCount;
-            this.folderCount = folderCount;
-        }
-
-        public Long getTotalSize() {
-            return totalSize;
-        }
-
-        public Integer getFileCount() {
-            return fileCount;
-        }
-
-        public Integer getFolderCount() {
-            return folderCount;
-        }
+    record CloudFolderStatistics(Long totalSize, Integer fileCount, Integer folderCount) {
 
         public String getFormattedTotalSize() {
-            if (totalSize == null) return "0 B";
-            long size = totalSize;
-            if (size < 1024) return size + " B";
-            if (size < 1024 * 1024) return String.format("%.1f KB", size / 1024.0);
-            if (size < 1024 * 1024 * 1024) return String.format("%.1f MB", size / (1024.0 * 1024));
-            return String.format("%.1f GB", size / (1024.0 * 1024 * 1024));
+                if (totalSize == null) return "0 B";
+                long size = totalSize;
+                if (size < 1024) return size + " B";
+                if (size < 1024 * 1024) return String.format("%.1f KB", size / 1024.0);
+                if (size < 1024 * 1024 * 1024) return String.format("%.1f MB", size / (1024.0 * 1024));
+                return String.format("%.1f GB", size / (1024.0 * 1024 * 1024));
+            }
         }
-    }
 }
