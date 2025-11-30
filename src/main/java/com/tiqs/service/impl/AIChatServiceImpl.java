@@ -36,6 +36,9 @@ public class AIChatServiceImpl implements AIChatService {
     public AIChatServiceImpl(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+
+
+
     //目前来看默认选择tstar2.0是最稳定的，但这个模型也是最蠢的，回答质量不高
     @Override
     public AIChatResponse chat(AIChatRequest request) {
