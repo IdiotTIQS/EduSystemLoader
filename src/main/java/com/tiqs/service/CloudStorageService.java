@@ -32,8 +32,6 @@ public interface CloudStorageService {
 
     void deleteFile(Long id, Long userId);
 
-    void incrementFileDownloadCount(Long id);
-
     byte[] downloadFile(Long id, Long userId);
 
     CloudFileStatistics getFileStatistics(Long classId);

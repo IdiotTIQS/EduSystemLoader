@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import TeacherDashboard from '../views/TeacherDashboard.vue';
 import StudentDashboard from '../views/StudentDashboard.vue';
+import AIChat from '../components/AIChat.vue';
 import { getAuth } from '../services/auth';
 
 const router = createRouter({
@@ -22,6 +23,12 @@ const router = createRouter({
       name: 'student-dashboard',
       component: StudentDashboard,
       meta: { requiresAuth: true, role: 'STUDENT' },
+    },
+    {
+      path: '/ai-chat',
+      name: 'ai-chat',
+      component: AIChat,
+      meta: { requiresAuth: true },
     },
   ],
 });

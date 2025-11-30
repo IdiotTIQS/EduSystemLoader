@@ -8,6 +8,7 @@ import DiscussionList from '../components/DiscussionList.vue';
 import DiscussionDetail from '../components/DiscussionDetail.vue';
 import CreateDiscussion from '../components/CreateDiscussion.vue';
 import CloudDrive from '../components/CloudDrive.vue';
+import AIChat from '../components/AIChat.vue';
 
 const router = useRouter();
 const auth = getAuth();
@@ -164,6 +165,7 @@ const pageTitle = computed(() => {
     assignments: '作业提交',
     discussions: '班级讨论',
     'cloud-drive': '班级云盘',
+    'ai-chat': 'AI问答助手',
     profile: '个人信息'
   };
   return titles[currentPage.value] || '学习空间';
@@ -177,6 +179,7 @@ const pageSubtitle = computed(() => {
     assignments: '查看和提交作业',
     discussions: '参与班级讨论和交流',
     'cloud-drive': '查看和下载班级共享文件',
+    'ai-chat': '与AI助手交流，获取作业帮助',
     profile: '管理个人信息和联系方式'
   };
   return subtitles[currentPage.value] || '学生端学习空间';
@@ -292,6 +295,11 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
           @click="switchPage('cloud-drive')" 
           :class="['nav-item', { active: currentPage === 'cloud-drive' }]">
           班级云盘
+        </button>
+        <button 
+          @click="switchPage('ai-chat')" 
+          :class="['nav-item', { active: currentPage === 'ai-chat' }]">
+          AI问答
         </button>
         <button 
           @click="switchPage('profile')" 
@@ -557,6 +565,12 @@ watch(() => state.currentCourseId, async () => { await fetchAssignments(); });
         <div v-else class="page-content">
           <CloudDrive :class-id="state.currentClassId" :is-teacher="false" />
         </div>
+        </div>
+      </transition>
+
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'ai-chat'" class="page-content" key="ai-chat">
+          <AIChat />
         </div>
       </transition>
 

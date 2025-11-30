@@ -3,7 +3,7 @@ import { getToken, clearAuth } from './auth';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
-  timeout: 15000,
+  timeout: 60000, // 增加到60秒，适应AI响应时间
 });
 
 api.interceptors.request.use((config) => {
@@ -159,6 +159,12 @@ export const cloudFolderApi = {
   getStatistics: (classId) => api.get('/api/cloud/folders/statistics', {
     params: { classId }
   }),
+};
+
+// AI聊天专用API，使用更长的超时时间
+export const aiApi = {
+  chat: (body) => api.post('/api/ai/chat', body, { timeout: 120000 }), // 2分钟超时
+  getModels: () => api.get('/api/ai/models', { timeout: 30000 }) // 30秒超时
 };
 
 export default api;

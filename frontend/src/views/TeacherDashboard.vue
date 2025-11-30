@@ -7,6 +7,7 @@ import DiscussionList from '../components/DiscussionList.vue';
 import DiscussionDetail from '../components/DiscussionDetail.vue';
 import CreateDiscussion from '../components/CreateDiscussion.vue';
 import CloudDrive from '../components/CloudDrive.vue';
+import AIChat from '../components/AIChat.vue';
 
 const router = useRouter();
 const auth = getAuth();
@@ -85,7 +86,8 @@ const pageTitle = computed(() => {
     submissions: '提交管理',
     submissionDetail: '提交详情',
     discussions: '班级讨论',
-    'cloud-drive': '班级云盘'
+    'cloud-drive': '班级云盘',
+    'ai-chat': 'AI问答助手'
   };
   return titles[currentPage.value] || '控制面板';
 });
@@ -99,7 +101,8 @@ const pageSubtitle = computed(() => {
     submissions: '查看学生作业提交情况',
     submissionDetail: '查看学生提交的具体内容',
     discussions: '管理班级讨论和学生交流',
-    'cloud-drive': '管理班级共享文件和资源'
+    'cloud-drive': '管理班级共享文件和资源',
+    'ai-chat': '与AI助手交流，获取教学建议'
   };
   return subtitles[currentPage.value] || '教师端控制面板';
 });
@@ -549,6 +552,11 @@ watch(
           @click="switchPage('cloud-drive')" 
           :class="['nav-item', { active: currentPage === 'cloud-drive' }]">
           班级云盘
+        </button>
+        <button 
+          @click="switchPage('ai-chat')" 
+          :class="['nav-item', { active: currentPage === 'ai-chat' }]">
+          AI问答
         </button>
         <button 
           @click="switchPage('submissions')" 
@@ -1044,6 +1052,13 @@ watch(
         </div>
       </div>
         </transition>
+
+      <!-- AI问答页面 -->
+      <transition name="page-fade" mode="out-in">
+        <div v-if="currentPage === 'ai-chat'" class="page-content" key="ai-chat">
+          <AIChat />
+        </div>
+      </transition>
     </main>
   </section>
 </template>
