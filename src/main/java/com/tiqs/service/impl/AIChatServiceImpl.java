@@ -27,6 +27,10 @@ public class AIChatServiceImpl implements AIChatService {
     
     @Value("${ai.api.key:}")
     private String apiKey;
+
+
+
+
     
     @Value("${ai.api.url:https://api.openai.com/v1/chat/completions}")
     private String apiUrl;
