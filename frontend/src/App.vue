@@ -13,7 +13,7 @@ const isAuthPage = () => {
   <div class="app-shell">
     <header v-if="!isAuthPage()">
       <div>
-        <h1>EduSystem Loader 控制台</h1>
+        <h1>EduSystem Loader A控制台</h1>
         <p class="subtitle">教师、学生一体化教学协作平台</p>
       </div>
       <nav>
