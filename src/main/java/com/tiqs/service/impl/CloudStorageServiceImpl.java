@@ -206,12 +206,6 @@ public class CloudStorageServiceImpl implements CloudStorageService {
     }
 
     @Override
-    @Transactional
-    public void incrementFileDownloadCount(Long id) {
-        cloudFileMapper.incrementDownloadCount(id);
-    }
-
-    @Override
     public byte[] downloadFile(Long id, Long userId) {
         CloudFile cloudFile = getFile(id);
 
@@ -264,8 +258,7 @@ public class CloudStorageServiceImpl implements CloudStorageService {
         // 危险文件类型列表
         String[] dangerousTypes = {
                 "exe", "bat", "cmd", "com", "scr", "msi", "dll", "so", "dylib",
-                "sh", "bash", "zsh", "fish", "ps1", "py", "pl", "rb", "php",
-                "asp", "jsp", "js", "vbs", "wsf", "jar", "app", "deb", "rpm",
+                "sh", "bash", "zsh", "fish", "ps1", "pl", "rb", "vbs", "wsf", "jar", "app", "deb", "rpm",
                 "dmg", "pkg", "iso", "img", "vmdk", "ova", "ovf"
         };
 

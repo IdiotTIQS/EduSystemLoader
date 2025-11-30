@@ -24,7 +24,6 @@ public class AIChatController {
 
     @PostMapping("/chat")
     public ApiResponse<AIChatResponse> chat(@RequestBody AIChatRequest request) {
-        log.info("AI问答请求 userId={} question={}", request.getUserId(), request.getQuestion());
         AIChatResponse response = aiChatService.chat(request);
         return ApiResponse.ok(response);
     }
