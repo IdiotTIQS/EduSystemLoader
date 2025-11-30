@@ -22,6 +22,8 @@ public class AIChatController {
         this.aiChatService = aiChatService;
     }
 
+
+
     @PostMapping("/chat")
     public ApiResponse<AIChatResponse> chat(@RequestBody AIChatRequest request) {
         AIChatResponse response = aiChatService.chat(request);
