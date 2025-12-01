@@ -61,6 +61,7 @@ const handleRegister = async () => {
     <div class="form-container">
       <div class="signin-signup">
         <form action="#" class="sign-up-form" @submit.prevent="handleRegister">
+          <img src="@/assets/images/Logo.png" alt="Logo" class="logo" />
           <h2 class="title">注册账号</h2>
           <div class="input-field">
             <i>
@@ -184,6 +185,11 @@ form {
   color: #444;
   margin-bottom: 2rem;
   text-align: center;
+}
+
+.logo {
+  width: 80px;
+  margin-bottom: 1rem;
 }
 
 .input-field {

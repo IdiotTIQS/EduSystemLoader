@@ -90,6 +90,7 @@ const handleRegister = async () => {
     <div class="form-container">
       <div class="signin-signup">
         <form action="#" class="sign-in-form" @submit.prevent="handleLogin">
+          <img src="@/assets/images/Logo.png" alt="Logo" class="logo" />
           <h2 class="title">登录</h2>
           <div class="input-field">
             <i><font-awesome-icon icon="fa-solid fa-user" /></i>
@@ -117,6 +118,7 @@ const handleRegister = async () => {
           </div>
         </form>
         <form action="#" class="sign-up-form" @submit.prevent="handleRegister">
+          <img src="@/assets/images/Logo.png" alt="Logo" class="logo" />
           <h2 class="title">注册</h2>
           <div class="input-field">
             <i><font-awesome-icon icon="fa-solid fa-user" /></i>
@@ -253,6 +255,11 @@ form.sign-in-form {
 .title {
     font-size: 2.2rem;
     color: #444;
+    margin-bottom: 10px;
+}
+
+.logo {
+    width: 80px;
     margin-bottom: 10px;
 }
 
