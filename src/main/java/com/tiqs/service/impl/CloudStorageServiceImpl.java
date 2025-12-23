@@ -259,7 +259,8 @@ public class CloudStorageServiceImpl implements CloudStorageService {
         String[] dangerousTypes = {
                 "exe", "bat", "cmd", "com", "scr", "msi", "dll", "so", "dylib",
                 "sh", "bash", "zsh", "fish", "ps1", "pl", "rb", "vbs", "wsf", "jar", "app", "deb", "rpm",
-                "dmg", "pkg", "iso", "img", "vmdk", "ova", "ovf"
+                "dmg", "pkg", "iso", "img", "vmdk", "ova", "ovf",
+                "html", "htm", "svg", "xml", "xhtml"
         };
 
         for (String dangerousType : dangerousTypes) {

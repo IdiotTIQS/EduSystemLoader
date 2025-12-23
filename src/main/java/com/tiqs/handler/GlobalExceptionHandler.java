@@ -62,13 +62,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public String handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
         log.warn("静态资源未找到: {}", request.getRequestURI());
-        return "redirect:/"; // 或者返回404页面
+        return "redirect:/";
     }
 
     @ExceptionHandler(org.apache.catalina.connector.ClientAbortException.class)
     public String handleClientAbortException(org.apache.catalina.connector.ClientAbortException ex) {
         log.debug("客户端中断连接: {}", ex.getMessage());
-        return null; // 不返回任何响应，因为客户端已经断开
+        return null;
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
@@ -151,11 +151,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ApiResponse<Void> handle(Exception ex, HttpServletRequest request) {
-        // 检查是否是静态资源请求
         String uri = request.getRequestURI();
         if (uri.startsWith("/uploads/") || uri.startsWith("/static/") || uri.startsWith("/css/") || uri.startsWith("/js/")) {
             log.warn("静态资源访问异常: {} - {}", uri, ex.getMessage());
-            return null; // 对于静态资源异常，不返回JSON响应
+            return null;
         }
 
         log.error("系统未处理异常: {}", uri, ex);

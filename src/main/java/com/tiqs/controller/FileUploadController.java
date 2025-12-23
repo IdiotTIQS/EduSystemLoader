@@ -57,7 +57,8 @@ public class FileUploadController {
                 String[] forbiddenExtensions = {
                         ".exe", ".bat", ".sh", ".cmd", ".com", ".scr", ".msi",
                         ".sql", ".ddl", ".dml", ".pl", ".php", ".asp", ".jsp",
-                        ".js", ".vbs", ".py", ".rb", ".ps1", ".bash", ".zsh"
+                        ".js", ".vbs", ".py", ".rb", ".ps1", ".bash", ".zsh",
+                        ".html", ".htm", ".svg", ".xml", ".xhtml"
                 };
 
                 for (String ext : forbiddenExtensions) {
