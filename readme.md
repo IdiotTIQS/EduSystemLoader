@@ -1,7 +1,72 @@
-<h1>Education System</h1>
-<p> This is a simple education system.Code base by GPT5-copilot</p>
-<p>大神AI</p>
-<p>API调用相关文档详见Apidoc.md</p>
+<h1>EduSystemLoader - 在线教育管理系统</h1>
+<p>一个功能完整的在线教育管理系统，支持教师与学生之间的教学互动、作业管理、课程讨论、云存储以及 AI 智能辅导功能。</p>
+
+<h2>项目功能特性</h2>
+<ul>
+  <li><strong>用户认证</strong>：基于 JWT 的用户登录与注册，支持教师和学生两种角色</li>
+  <li><strong>班级管理</strong>：教师可创建班级，学生可加入班级</li>
+  <li><strong>课程管理</strong>：教师创建课程，上传课程资料（PDF、PPT、链接等）</li>
+  <li><strong>作业系统</strong>：教师发布作业，学生提交作业，教师批改评分</li>
+  <li><strong>讨论区</strong>：班级内发起讨论，支持评论与回复</li>
+  <li><strong>云存储</strong>：班级文件云盘，支持文件夹层级管理</li>
+  <li><strong>AI 聊天</strong>：集成 AI 助手，提供智能答疑服务</li>
+  <li><strong>文件上传</strong>：支持大文件上传（最大 100MB）</li>
+</ul>
+
+<h2>技术栈</h2>
+
+<h3>后端</h3>
+<ul>
+  <li>Spring Boot 3.5.8</li>
+  <li>MyBatis 3.0.5</li>
+  <li>Spring Security Crypto</li>
+  <li>JWT (jjwt 0.12.5)</li>
+  <li>MySQL Connector</li>
+  <li>Unirest Java (HTTP 客户端)</li>
+  <li>Lombok</li>
+</ul>
+
+<h3>前端（Vue 版本）</h3>
+<ul>
+  <li>Vue 3.5.24</li>
+  <li>Vue Router 4.6.3</li>
+  <li>Vite (rolldown-vite 7.2.5)</li>
+  <li>Axios 1.13.2</li>
+  <li>Font Awesome 7.1.0</li>
+</ul>
+
+<h3>前端（HTML 版本）</h3>
+<ul>
+  <li>原生 HTML/CSS/JavaScript</li>
+  <li>Webpack 5.91.0</li>
+</ul>
+
+<h2>项目结构</h2>
+<pre><code>EduSystemLoader/
+├── src/main/java/com/tiqs/        # 后端源代码
+│   ├── auth/                       # 认证与授权模块
+│   ├── controller/                 # REST API 控制器
+│   ├── dto/                        # 数据传输对象
+│   ├── entity/                     # 数据库实体
+│   ├── mapper/                     # MyBatis Mapper
+│   ├── service/                    # 业务逻辑层
+│   ├── config/                     # 配置类
+│   └── handler/                    # 全局异常处理
+├── frontend-Vue/                   # Vue 3 前端项目
+│   ├── src/
+│   │   ├── components/             # Vue 组件
+│   │   ├── views/                  # 页面视图
+│   │   ├── router/                 # 路由配置
+│   │   └── services/               # API 服务
+├── Frontend-HTML/                  # 纯 HTML 前端项目
+│   ├── css/                        # 样式文件
+│   ├── js/                         # JavaScript 文件
+│   └── pages/                      # 页面文件
+├── .github/workflows/              # CI/CD 配置
+├── .workflow/                      # 工作流配置
+└── uploads/                        # 文件上传目录</code></pre>
+
+<p>API调用相关文档详见 <a href="./ApiDoc.md">ApiDoc.md</a></p>
 <p>项目已在 <a href="https://gitee.com/IdiotTIQS/EduSystemLoader.git">Gitee</a> 与 <a href="https://github.com/IdiotTIQS/EduSystemLoader.git">GitHub</a> 同步开源，欢迎 Star , Fork 与 Issue。</p>
 
 <h2>数据库设计</h2>
@@ -269,6 +334,17 @@ export JWT_SECRET="your_jwt_secret_key"</code></pre>
 
 <p><strong>注意</strong>：<code>.env</code> 文件已添加到 <code>.gitignore</code> 中，不会被提交到版本控制系统，确保敏感信息安全。</p>
 
+<h4>AI 配置</h4>
+<p>项目集成了 AI 聊天功能，需要配置 AI API 密钥：</p>
+<ul>
+<li><strong>AI_API_KEY</strong>：AI 服务 API 密钥（默认：sk-f015a829c0e40b482aa169c2dc6ed90a）</li>
+<li><strong>AI_API_URL</strong>：AI 服务 API 地址（默认：https://apis.iflow.cn/v1/chat/completions）</li>
+</ul>
+<p>可在 <code>.env</code> 文件中添加：</p>
+<pre><code># AI 配置
+AI_API_KEY=your_ai_api_key
+AI_API_URL=https://your-ai-service.com/v1/chat/completions</code></pre>
+
 <h2>快速开始</h2>
 <p>本项目包含后端 Spring Boot 与前端 Vue(Vite)。以下命令均以 Windows <code>cmd.exe</code> 为例。</p>
 
@@ -289,19 +365,19 @@ export JWT_SECRET="your_jwt_secret_key"</code></pre>
 <h3>构建可执行 JAR</h3>
 <pre><code>mvnw.cmd clean package -DskipTests
 </code></pre>
-<p>打包后 JAR 位于 <code>target/EduSystemLoader-0.0.1-SNAPSHOT.jar</code>。</p>
+<p>打包后 JAR 位于 <code>target/EduSystemLoader-0.0.2-SNAPSHOT.jar</code>。</p>
 
 <h3>运行打包后的 JAR</h3>
-<pre><code>java -jar target/EduSystemLoader-0.0.1-SNAPSHOT.jar</code></pre>
+<pre><code>java -jar target/EduSystemLoader-0.0.2-SNAPSHOT.jar</code></pre>
 
 <h3>执行测试</h3>
 <pre><code>mvnw.cmd test</code></pre>
 
 <h2>前端 (Vue 3 + Vite)</h2>
-<p>前端源代码位于 <code>frontend/</code> 目录。</p>
+<p>Vue 前端源代码位于 <code>frontend-Vue/</code> 目录，是主要推荐使用的现代前端实现。</p>
 
 <h3>安装依赖</h3>
-<pre><code>cd frontend
+<pre><code>cd frontend-Vue
 npm install</code></pre>
 
 <h3>开发启动 (热更新)</h3>
@@ -310,7 +386,7 @@ npm install</code></pre>
 
 <h3>构建静态资源</h3>
 <pre><code>npm run build</code></pre>
-<p>生成产物位于 <code>frontend/dist</code>。可将其交给 Nginx/静态服务器或集成到后端静态目录（例如复制到 <code>src/main/resources/static</code>）。</p>
+<p>生成产物位于 <code>frontend-Vue/dist</code>。可将其交给 Nginx/静态服务器或集成到后端静态目录（例如复制到 <code>src/main/resources/static</code>）。</p>
 
 <h3>生产模式本地静态启动 (使用 serve)</h3>
 <pre><code>npm run serve</code></pre>
@@ -320,7 +396,21 @@ npm install</code></pre>
 <pre><code>npm run preview</code></pre>
 <p>如果仍需要使用 Vite 自带的预览，可继续保留此命令；推荐使用 <code>npm run serve</code> 更贴近真实静态服务器行为。</p>
 
-<h3>常用脚本汇总</h3>
+<h2>前端 (HTML + Webpack)</h2>
+<p>纯 HTML 前端位于 <code>Frontend-HTML/</code> 目录，使用 Webpack 构建。</p>
+
+<h3>安装依赖</h3>
+<pre><code>cd Frontend-HTML
+npm install</code></pre>
+
+<h3>开发启动</h3>
+<pre><code>npm start</code></pre>
+<p>Webpack Dev Server 默认端口为 <code>8080</code>。</p>
+
+<h3>构建生产版本</h3>
+<pre><code>npm run build</code></pre>
+
+<h2>常用脚本汇总</h2>
 <table>
   <thead>
     <tr><th>阶段</th><th>命令</th><th>说明</th></tr>
@@ -329,11 +419,13 @@ npm install</code></pre>
     <tr><td>后端运行</td><td><code>mvnw.cmd spring-boot:run</code></td><td>启动后端服务</td></tr>
     <tr><td>后端构建</td><td><code>mvnw.cmd clean package -DskipTests</code></td><td>编译打包 JAR</td></tr>
     <tr><td>后端测试</td><td><code>mvnw.cmd test</code></td><td>执行单元测试</td></tr>
-    <tr><td>前端依赖</td><td><code>npm install</code></td><td>安装依赖</td></tr>
-    <tr><td>前端开发</td><td><code>npm run dev</code></td><td>启动热更新开发服务器</td></tr>
-    <tr><td>前端构建</td><td><code>npm run build</code></td><td>生成生产环境静态资源</td></tr>
-    <tr><td>前端静态启动</td><td><code>npm run serve</code></td><td>使用 serve 模拟生产静态部署</td></tr>
-    <tr><td>前端预览(可选)</td><td><code>npm run preview</code></td><td>Vite 内置预览模式</td></tr>
+    <tr><td>Vue 前端依赖</td><td><code>cd frontend-Vue &amp;&amp; npm install</code></td><td>安装 Vue 依赖</td></tr>
+    <tr><td>Vue 前端开发</td><td><code>cd frontend-Vue &amp;&amp; npm run dev</code></td><td>启动 Vue 热更新开发服务器</td></tr>
+    <tr><td>Vue 前端构建</td><td><code>cd frontend-Vue &amp;&amp; npm run build</code></td><td>生成 Vue 生产环境静态资源</td></tr>
+    <tr><td>Vue 前端静态启动</td><td><code>cd frontend-Vue &amp;&amp; npm run serve</code></td><td>使用 serve 模拟生产静态部署</td></tr>
+    <tr><td>HTML 前端依赖</td><td><code>cd Frontend-HTML &amp;&amp; npm install</code></td><td>安装 HTML 依赖</td></tr>
+    <tr><td>HTML 前端开发</td><td><code>cd Frontend-HTML &amp;&amp; npm start</code></td><td>启动 HTML Webpack Dev Server</td></tr>
+    <tr><td>HTML 前端构建</td><td><code>cd Frontend-HTML &amp;&amp; npm run build</code></td><td>构建 HTML 生产版本</td></tr>
   </tbody>
 </table>
 
@@ -348,10 +440,10 @@ npm install</code></pre>
 <h2>部署简单流程示例</h2>
 <ol>
   <li>执行后端打包：<code>mvnw.cmd clean package -DskipTests</code></li>
-  <li>执行前端构建：<code>npm run build</code></li>
-  <li>将 <code>frontend/dist</code> 内容复制到后端 <code>src/main/resources/static</code> (如需由 Spring Boot 直接托管)</li>
+  <li>执行前端构建（Vue 版本）：<code>cd frontend-Vue &amp;&amp; npm run build</code></li>
+  <li>将 <code>frontend-Vue/dist</code> 内容复制到后端 <code>src/main/resources/static</code> (如需由 Spring Boot 直接托管)</li>
   <li>重新打包后端（若复制了静态资源）：<code>mvnw.cmd clean package -DskipTests</code></li>
-  <li>服务器运行：<code>java -jar EduSystemLoader-0.0.1-SNAPSHOT.jar</code></li>
+  <li>服务器运行：<code>java -jar target/EduSystemLoader-0.0.2-SNAPSHOT.jar</code></li>
 </ol>
 
 <h2>故障排查</h2>
@@ -359,6 +451,28 @@ npm install</code></pre>
   <li>端口占用：修改 <code>application.properties</code> 或 Vite 配置 <code>vite.config.js</code>.</li>
   <li>NPM 安装缓慢：使用国内镜像 <code>npm config set registry https://registry.npmmirror.com</code>.</li>
   <li>JAR 启动失败：确认 JDK 版本、查看日志栈信息。</li>
+  <li>数据库连接失败：检查数据库服务是否启动，确认连接配置正确。</li>
+  <li>AI 聊天无响应：检查 AI_API_KEY 和 AI_API_URL 配置是否正确。</li>
+</ul>
+
+<h2>许可证</h2>
+<p>本项目采用开源许可证，详见 <a href="./LICENSE">LICENSE</a> 文件。</p>
+
+<h2>贡献指南</h2>
+<p>欢迎贡献代码！请遵循以下步骤：</p>
+<ol>
+  <li>Fork 本仓库</li>
+  <li>创建特性分支 (<code>git checkout -b feature/AmazingFeature</code>)</li>
+  <li>提交更改 (<code>git commit -m 'Add some AmazingFeature'</code>)</li>
+  <li>推送到分支 (<code>git push origin feature/AmazingFeature</code>)</li>
+  <li>提交 Pull Request</li>
+</ol>
+
+<h2>相关文档</h2>
+<ul>
+  <li><a href="./ApiDoc.md">API 文档</a></li>
+  <li><a href="./SecurityReport.md">安全报告</a></li>
+  <li><a href="./项目优化建议.md">项目优化建议</a></li>
 </ul>
 
 <p>欢迎补充与改进！</p>
