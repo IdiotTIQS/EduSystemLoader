@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师控制台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#6B7280'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '2px',
+                        DEFAULT: '4px',
+                        'md': '8px',
+                        'lg': '12px',
+                        'xl': '16px',
+                        '2xl': '20px',
+                        '3xl': '24px',
+                        'full': '9999px',
+                        'button': '4px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            min-height: 1024px;
+            width: 1440px;
+            margin: 0 auto;
+        }
+        .fade-enter-active {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .fade-enter-from {
+            opacity: 0;
+        }
+        .fade-enter-to {
+            opacity: 1;
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-cell-first {
+            border-top-left-radius: 0.5rem;
+            border-bottom-left-radius: 0.5rem;
+        }
+        .table-cell-last {
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg flex flex-col z-10">
+            <div class="p-6 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-indigo-600">教师控制台</h1>
+                <div class="mt-4 flex items-center space-x-3">
+                    <img src="https://ai-public.mastergo.com/ai/img_res/78d96c6a817805135417d99241b1eb70.jpg" alt="User Avatar" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <p class="font-medium">李老师</p>
+                        <p class="text-xs text-gray-500">li.teacher@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a href="#" onclick="switchTab('dashboard'); return false;" id="dashboard-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md">
+                    <i class="fas fa-home mr-3"></i>
+                    仪表盘
+                </a>
+                <a href="#" onclick="switchTab('classes'); return false;" id="classes-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-users mr-3"></i>
+                    班级管理
+                </a>
+                <a href="#" onclick="switchTab('courses'); return false;" id="courses-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-book-open mr-3"></i>
+                    课程管理
+                </a>
+                <a href="#" onclick="switchTab('assignments'); return false;" id="assignments-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-tasks mr-3"></i>
+                    作业发布
+                </a>
+                <a href="#" onclick="switchTab('submissions'); return false;" id="submissions-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-check-circle mr-3"></i>
+                    提交管理
+                </a>
+                <a href="#" onclick="switchTab('members'); return false;" id="members-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-user-friends mr-3"></i>
+                    班级成员
+                </a>
+                <a href="#" onclick="switchTab('discussions'); return false;" id="discussions-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-comments mr-3"></i>
+                    班级讨论
+                </a>
+                <a href="#" onclick="switchTab('cloud'); return false;" id="cloud-link" class="flex items-center px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100">
+                    <i class="fas fa-cloud mr-3"></i>
+                    班级云盘
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200">
+                <button class="!rounded-button whitespace-nowrap w-full py-2 px-4 bg-red-500 text-white hover:bg-red-600 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+                </button>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto p-8 transition-opacity duration-300 ease-in-out">
+            <div id="dashboard-content" class="fade-enter-active">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">欢迎回来，李老师！</h1>
+                    <p class="text-gray-600 mt-2">这里是您的教学管理中心，您可以在这里管理班级、课程和学生作业。</p>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold">我的班级</h3>
+                                <p class="text-3xl font-bold mt-2">5</p>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-lg">
+                                <i class="fas fa-users text-blue-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-4">您目前管理 5 个班级</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold">课程总数</h3>
+                                <p class="text-3xl font-bold mt-2">18</p>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-lg">
+                                <i class="fas fa-book-open text-green-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-4">共开设 18 门课程</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold">待批改作业</h3>
+                                <p class="text-3xl font-bold mt-2">24</p>
+                            </div>
+                            <div class="p-3 bg-yellow-100 rounded-lg">
+                                <i class="fas fa-tasks text-yellow-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-4">还有 24 份作业等待批改</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h2 class="text-xl font-semibold mb-4">最近活动</h2>
+                    <ul class="space-y-4">
+                        <li class="flex items-center pb-4 border-b border-gray-100">
+                            <div class="mr-4 p-2 bg-indigo-100 rounded-lg">
+                                <i class="fas fa-user-plus text-indigo-500"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">新学生加入</p>
+                                <p class="text-gray-500 text-sm">张伟加入了高等数学 A 班</p>
+                            </div>
+                            <span class="ml-auto text-gray-400 text-sm">2 小时前</span>
+                        </li>
+                        <li class="flex items-center pb-4 border-b border-gray-100">
+                            <div class="mr-4 p-2 bg-green-100 rounded-lg">
+                                <i class="fas fa-file-upload text-green-500"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">作业提交</p>
+                                <p class="text-gray-500 text-sm">王丽提交了线性代数作业</p>
+                            </div>
+                            <span class="ml-auto text-gray-400 text-sm">5 小时前</span>
+                        </li>
+                        <li class="flex items-center">
+                            <div class="mr-4 p-2 bg-yellow-100 rounded-lg">
+                                <i class="fas fa-comment-dots text-yellow-500"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">新的讨论</p>
+                                <p class="text-gray-500 text-sm">计算机科学基础班有了新讨论</p>
+                            </div>
+                            <span class="ml-auto text-gray-400 text-sm">1 天前</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="classes-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">班级管理</h1>
+                    <p class="text-gray-600 mt-2">创建和管理您的教学班级</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h2 class="text-xl font-semibold mb-4">创建新班级</h2>
+                        <form id="create-class-form">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">班级名称</label>
+                                <input
+                                    type="text"
+                                    id="class-name"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="请输入班级名称"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">邀请码</label>
+                                <input
+                                    type="text"
+                                    id="class-invite-code"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="请输入邀请码"
+                                    required
+                                />
+                            </div>
+                            <button type="submit" class="!rounded-button whitespace-nowrap py-2 px-6 bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                                创建班级
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h2 class="text-xl font-semibold mb-4">班级列表</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">班级名称</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邀请码</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="classes-table-body">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">高等数学 A 班</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">MATH2023A</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-09-01</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-500 hover:text-blue-700 mr-3">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">线性代数 B 班</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">LINEAR2023B</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-09-05</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-500 hover:text-blue-700 mr-3">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">计算机科学基础</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">CS101</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-09-10</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-500 hover:text-blue-700 mr-3">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">物理学导论</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">PHYS101</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-09-15</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-500 hover:text-blue-700 mr-3">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">英语写作进阶</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">ENG202</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-09-20</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-blue-500 hover:text-blue-700 mr-3">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="courses-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">课程管理</h1>
+                    <p class="text-gray-600 mt-2">创建和管理您的课程</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h2 class="text-xl font-semibold mb-4">创建新课程</h2>
+                        <form id="create-course-form">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">所属班级</label>
+                                <div class="relative">
+                                    <select
+                                        id="course-class-id"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="">请选择班级</option>
+                                        <option value="1">高等数学 A 班</option>
+                                        <option value="2">线性代数 B 班</option>
+                                        <option value="3">计算机科学基础</option>
+                                        <option value="4">物理学导论</option>
+                                        <option value="5">英语写作进阶</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">课程标题</label>
+                                <input
+                                    type="text"
+                                    id="course-title"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="请输入课程标题"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">课程描述</label>
+                                <textarea
+                                    id="course-description"
+                                    rows="3"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="请输入课程描述"
+                                ></textarea>
+                            </div>
+                            <button type="submit" class="!rounded-button whitespace-nowrap py-2 px-6 bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                                创建课程
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h2 class="text-xl font-semibold mb-4">课程列表</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">课程标题</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">所属班级</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="courses-table-body">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">微积分基础</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">高等数学 A 班</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">矩阵运算</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">线性代数 B 班</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">编程入门</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">计算机科学基础</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">力学原理</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">物理学导论</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">学术写作技巧</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">英语写作进阶</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="assignments-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">作业发布</h1>
+                    <p class="text-gray-600 mt-2">创建和管理学生的作业任务</p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h2 class="text-xl font-semibold mb-4">发布新作业</h2>
+                        <form id="create-assignment-form">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">绑定课程</label>
+                                <div class="relative">
+                                    <select
+                                        id="assignment-course-id"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="">请选择课程</option>
+                                        <option value="1">微积分基础</option>
+                                        <option value="2">矩阵运算</option>
+                                        <option value="3">编程入门</option>
+                                        <option value="4">力学原理</option>
+                                        <option value="5">学术写作技巧</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">作业标题</label>
+                                <input
+                                    type="text"
+                                    id="assignment-title"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="请输入作业标题"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">截止时间</label>
+                                <input
+                                    type="datetime-local"
+                                    id="assignment-deadline"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    required
+                                />
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">作业描述</label>
+                                <textarea
+                                    id="assignment-description"
+                                    rows="4"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="请输入作业描述"
+                                ></textarea>
+                            </div>
+                            <button type="submit" class="!rounded-button whitespace-nowrap py-2 px-6 bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+                                发布作业
+                            </button>
+                        </form>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                        <h2 class="text-xl font-semibold mb-4">已发布作业</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标题</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">截止时间</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="assignments-table-body">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">极限与连续性练习</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-10-15 23:59</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">行列式计算作业</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-10-18 23:59</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">第一个编程项目</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">2023-10-20 23:59</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <button class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="submissions-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">提交管理</h1>
+                    <p class="text-gray-600 mt-2">查看和批改学生的作业提交</p>
+                </header>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 mb-8">
+                    <h2 class="text-xl font-semibold mb-4">筛选条件</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2">选择班级</label>
+                            <div class="relative">
+                                <select
+                                    id="submission-class-id"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="">请选择班级</option>
+                                    <option value="1">高等数学 A 班</option>
+                                    <option value="2">线性代数 B 班</option>
+                                    <option value="3">计算机科学基础</option>
+                                    <option value="4">物理学导论</option>
+                                    <option value="5">英语写作进阶</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">选择课程</label>
+                            <div class="relative">
+                                <select
+                                    id="submission-course-id"
+                                    disabled
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="">请选择课程</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">选择作业</label>
+                            <div class="relative">
+                                <select
+                                    id="submission-assignment-id"
+                                    disabled
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="">请选择作业</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h2 class="text-xl font-semibold mb-4">学生提交列表</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学生姓名</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">提交时间</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评分</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="submissions-table-body">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">张伟</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">zhangwei@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-10-14 15:30</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            已提交
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">85</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button onclick="viewSubmission(1)" class="text-blue-500 hover:text-blue-700">
+                                            查看详情
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">王丽</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">wangli@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-10-14 16:45</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            已提交
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">92</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button onclick="viewSubmission(2)" class="text-blue-500 hover:text-blue-700">
+                                            查看详情
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">李强</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">liqiang@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            未提交
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button disabled class="text-blue-500 hover:text-blue-700 opacity-50">
+                                            查看详情
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">陈敏</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">chenmin@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-10-13 20:15</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            已提交
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">78</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button onclick="viewSubmission(4)" class="text-blue-500 hover:text-blue-700">
+                                            查看详情
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="members-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">班级成员</h1>
+                    <p class="text-gray-600 mt-2">管理班级中的学生成员</p>
+                </header>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <h2 class="text-xl font-semibold mb-4">成员列表</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学生 ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">加入时间</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="members-table-body">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">S001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">张伟</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">zhangwei@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-09-02</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-blue-500 hover:text-blue-700 mr-3">查看提交</button>
+                                        <button class="text-red-500 hover:text-red-700">移除成员</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">S002</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">王丽</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">wangli@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-09-06</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-blue-500 hover:text-blue-700 mr-3">查看提交</button>
+                                        <button class="text-red-500 hover:text-red-700">移除成员</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">S003</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">李强</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">liqiang@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-09-11</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-blue-500 hover:text-blue-700 mr-3">查看提交</button>
+                                        <button class="text-red-500 hover:text-red-700">移除成员</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">S004</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">陈敏</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">chenmin@example.com</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">2023-09-16</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-blue-500 hover:text-blue-700 mr-3">查看提交</button>
+                                        <button class="text-red-500 hover:text-red-700">移除成员</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="discussions-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">班级讨论</h1>
+                    <p class="text-gray-600 mt-2">管理班级讨论区</p>
+                </header>
+
+                <div id="discussions-selection" class="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
+                    <i class="fas fa-comments text-5xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">请选择一个班级</h3>
+                    <p class="text-gray-500 mb-6">您需要先选择一个班级才能查看讨论内容</p>
+                    <div class="relative inline-block">
+                        <select
+                            id="discussion-class-select"
+                            onchange="selectDiscussionClass()"
+                            class="px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="">选择班级</option>
+                            <option value="1">高等数学 A 班</option>
+                            <option value="2">线性代数 B 班</option>
+                            <option value="3">计算机科学基础</option>
+                            <option value="4">物理学导论</option>
+                            <option value="5">英语写作进阶</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="discussions-view" class="hidden bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold">讨论区 - <span id="selected-class-name">请选择班级</span></h2>
+                        <button onclick="showDiscussionSelection()" class="text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-arrow-left mr-1"></i>返回选择
+                        </button>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="border-b border-gray-100 pb-6 last:border-0">
+                            <div class="flex items-start">
+                                <img src="https://ai-public.mastergo.com/ai/img_res/941b417aa2459b005d589f4e7db88887.jpg" alt="Avatar" class="w-10 h-10 rounded-full mr-4">
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <h4 class="font-semibold">张伟</h4>
+                                        <span class="text-gray-500 text-sm">2023-10-10 14:30</span>
+                                    </div>
+                                    <p class="mt-2 text-gray-700">老师，关于今天的微积分课，我不太理解洛必达法则的应用条件，能再解释一下吗？</p>
+                                    <div class="mt-4 flex space-x-4">
+                                        <button class="text-gray-500 hover:text-blue-500">
+                                            <i class="far fa-thumbs-up mr-1"></i>5
+                                        </button>
+                                        <button class="text-gray-500 hover:text-blue-500">
+                                            <i class="far fa-comment mr-1"></i>回复
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-b border-gray-100 pb-6 last:border-0">
+                            <div class="flex items-start">
+                                <img src="https://ai-public.mastergo.com/ai/img_res/b5fae758fdad14767feaf2915bc1c009.jpg" alt="Avatar" class="w-10 h-10 rounded-full mr-4">
+                                <div class="flex-1">
+                                    <div class="flex justify-between">
+                                        <h4 class="font-semibold">王丽</h4>
+                                        <span class="text-gray-500 text-sm">2023-10-11 09:15</span>
+                                    </div>
+                                    <p class="mt-2 text-gray-700">我觉得这个例子很实用，谢谢老师的分享！</p>
+                                    <div class="mt-4 flex space-x-4">
+                                        <button class="text-gray-500 hover:text-blue-500">
+                                            <i class="far fa-thumbs-up mr-1"></i>12
+                                        </button>
+                                        <button class="text-gray-500 hover:text-blue-500">
+                                            <i class="far fa-comment mr-1"></i>回复
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cloud-content" class="fade-enter-active hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold">班级云盘</h1>
+                    <p class="text-gray-600 mt-2">管理班级共享文件</p>
+                </header>
+
+                <div id="cloud-selection" class="bg-white rounded-2xl shadow-sm p-12 border border-gray-100 text-center">
+                    <i class="fas fa-cloud-upload-alt text-5xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">请选择一个班级</h3>
+                    <p class="text-gray-500 mb-6">您需要先选择一个班级才能查看云盘内容</p>
+                    <div class="relative inline-block">
+                        <select
+                            id="cloud-class-select"
+                            onchange="selectCloudClass()"
+                            class="px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="">选择班级</option>
+                            <option value="1">高等数学 A 班</option>
+                            <option value="2">线性代数 B 班</option>
+                            <option value="3">计算机科学基础</option>
+                            <option value="4">物理学导论</option>
+                            <option value="5">英语写作进阶</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+                <div id="cloud-view" class="hidden bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold">云盘 - <span id="selected-cloud-class-name">请选择班级</span></h2>
+                        <button onclick="showCloudSelection()" class="text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-arrow-left mr-1"></i>返回选择
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                            <div class="text-center">
+                                <i class="fas fa-file-pdf text-red-500 text-3xl mb-2"></i>
+                                <h3 class="font-medium truncate">课程大纲.pdf</h3>
+                                <p class="text-gray-500 text-sm">2.4 MB</p>
+                                <button class="mt-2 text-blue-500 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-download mr-1"></i>下载
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                            <div class="text-center">
+                                <i class="fas fa-file-powerpoint text-orange-500 text-3xl mb-2"></i>
+                                <h3 class="font-medium truncate">第一周课件.pptx</h3>
+                                <p class="text-gray-500 text-sm">5.1 MB</p>
+                                <button class="mt-2 text-blue-500 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-download mr-1"></i>下载
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                            <div class="text-center">
+                                <i class="fas fa-file-word text-blue-500 text-3xl mb-2"></i>
+                                <h3 class="font-medium truncate">作业模板.docx</h3>
+                                <p class="text-gray-500 text-sm">0.8 MB</p>
+                                <button class="mt-2 text-blue-500 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-download mr-1"></i>下载
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
+                            <div class="text-center">
+                                <i class="fas fa-file-archive text-yellow-500 text-3xl mb-2"></i>
+                                <h3 class="font-medium truncate">参考资料.zip</h3>
+                                <p class="text-gray-500 text-sm">12.3 MB</p>
+                                <button class="mt-2 text-blue-500 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-download mr-1"></i>下载
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Submission Detail Modal -->
+        <div id="submission-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold">提交详情</h3>
+                        <button onclick="closeSubmissionModal()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="submission-content">
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-2">学生回答：</h4>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p id="submission-answer">这是我对这个问题的详细解答。我认为应该从以下几个方面来分析：首先，需要理解问题的核心要求；其次，应用相关的理论知识；最后，结合实际情况进行论证。通过这样的步骤，我们可以得出一个全面且准确的结论。</p>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <h4 class="font-medium mb-2">附件：</h4>
+                            <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-file-pdf text-red-500 text-xl mr-3"></i>
+                                    <span id="submission-attachment">solution.pdf</span>
+                                </div>
+                                <button class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 pt-6">
+                            <h4 class="font-medium mb-4">评分与反馈</h4>
+                            <form id="grade-form">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">评分 (0-100)</label>
+                                    <input
+                                        type="number"
+                                        id="score-input"
+                                        min="0"
+                                        max="100"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        required
+                                    />
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">反馈意见</label>
+                                    <textarea
+                                        id="feedback-input"
+                                        rows="3"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="请输入反馈意见"
+                                    ></textarea>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button
+                                        type="button"
+                                        onclick="closeSubmissionModal()"
+                                        class="!rounded-button whitespace-nowrap py-2 px-6 border border-gray-300 text-gray-700 hover:bg-gray-50"
+                                    >
+                                        取消
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        class="!rounded-button whitespace-nowrap py-2 px-6 bg-blue-500 text-white hover:bg-blue-600"
+                                    >
+                                        提交评分
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始状态
+        let activeTab = 'dashboard';
+        let currentSubmission = null;
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 隐藏所有内容区域
+            document.querySelectorAll('[id$="-content"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // 移除所有导航项的活动状态
+            document.querySelectorAll('nav a').forEach(el => {
+                el.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white', 'shadow-md');
+                el.classList.add('hover:bg-gray-100');
+            });
+            
+            // 显示当前内容区域
+            document.getElementById(`${tabName}-content`).classList.remove('hidden');
+            
+            // 设置当前导航项为活动状态
+            document.getElementById(`${tabName}-link`).classList.remove('hover:bg-gray-100');
+            document.getElementById(`${tabName}-link`).classList.add('bg-gradient-to-r', 'from-blue-500', 'to-purple-500', 'text-white', 'shadow-md');
+            
+            activeTab = tabName;
+        }
+
+        // 表单提交处理
+        document.getElementById('create-class-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('class-name').value;
+            alert(`班级 "${name}" 创建成功！`);
+            document.getElementById('create-class-form').reset();
+        });
+
+        document.getElementById('create-course-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('course-title').value;
+            alert(`课程 "${title}" 创建成功！`);
+            document.getElementById('create-course-form').reset();
+        });
+
+        document.getElementById('create-assignment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('assignment-title').value;
+            alert(`作业 "${title}" 发布成功！`);
+            document.getElementById('create-assignment-form').reset();
+        });
+
+        // 评分表单提交
+        document.getElementById('grade-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const score = document.getElementById('score-input').value;
+            alert(`评分已提交！学生 ${currentSubmission.studentName} 得分: ${score}`);
+            closeSubmissionModal();
+            document.getElementById('grade-form').reset();
+        });
+
+        // 查看提交详情
+        function viewSubmission(submissionId) {
+            // 在实际应用中，这里会获取具体的提交数据
+            currentSubmission = {
+                id: submissionId,
+                studentName: ['张伟', '王丽', '李强', '陈敏'][submissionId-1],
+                answer: '这是我对这个问题的详细解答。我认为应该从以下几个方面来分析：首先，需要理解问题的核心要求；其次，应用相关的理论知识；最后，结合实际情况进行论证。通过这样的步骤，我们可以得出一个全面且准确的结论。',
+                attachment: 'solution.pdf'
+            };
+            
+            document.getElementById('submission-answer').textContent = currentSubmission.answer;
+            document.getElementById('submission-attachment').textContent = currentSubmission.attachment;
+            document.getElementById('submission-modal').classList.remove('hidden');
+        }
+
+        // 关闭提交详情模态框
+        function closeSubmissionModal() {
+            document.getElementById('submission-modal').classList.add('hidden');
+        }
+
+        // 讨论区选择班级
+        function selectDiscussionClass() {
+            const selectedClassId = document.getElementById('discussion-class-select').value;
+            if (selectedClassId) {
+                const classNames = {
+                    '1': '高等数学 A 班',
+                    '2': '线性代数 B 班',
+                    '3': '计算机科学基础',
+                    '4': '物理学导论',
+                    '5': '英语写作进阶'
+                };
+                document.getElementById('selected-class-name').textContent = classNames[selectedClassId];
+                document.getElementById('discussions-selection').classList.add('hidden');
+                document.getElementById('discussions-view').classList.remove('hidden');
+            }
+        }
+
+        // 显示讨论区选择
+        function showDiscussionSelection() {
+            document.getElementById('discussions-view').classList.add('hidden');
+            document.getElementById('discussions-selection').classList.remove('hidden');
+            document.getElementById('discussion-class-select').value = '';
+        }
+
+        // 云盘选择班级
+        function selectCloudClass() {
+            const selectedClassId = document.getElementById('cloud-class-select').value;
+            if (selectedClassId) {
+                const classNames = {
+                    '1': '高等数学 A 班',
+                    '2': '线性代数 B 班',
+                    '3': '计算机科学基础',
+                    '4': '物理学导论',
+                    '5': '英语写作进阶'
+                };
+                document.getElementById('selected-cloud-class-name').textContent = classNames[selectedClassId];
+                document.getElementById('cloud-selection').classList.add('hidden');
+                document.getElementById('cloud-view').classList.remove('hidden');
+            }
+        }
+
+        // 显示云盘选择
+        function showCloudSelection() {
+            document.getElementById('cloud-view').classList.add('hidden');
+            document.getElementById('cloud-selection').classList.remove('hidden');
+            document.getElementById('cloud-class-select').value = '';
+        }
+
+        // 课程选择依赖
+        document.getElementById('submission-class-id').addEventListener('change', function() {
+            const classId = this.value;
+            const courseSelect = document.getElementById('submission-course-id');
+            courseSelect.disabled = !classId;
+            
+            // 清空现有选项
+            courseSelect.innerHTML = '<option value="">请选择课程</option>';
+            
+            if (classId) {
+                // 根据班级ID添加对应的课程选项
+                const courses = {
+                    '1': ['微积分基础', '极限与连续性'],
+                    '2': ['矩阵运算', '行列式计算'],
+                    '3': ['编程入门', '数据结构'],
+                    '4': ['力学原理', '热力学基础'],
+                    '5': ['学术写作技巧', '文献阅读']
+                };
+                
+                if (courses[classId]) {
+                    courses[classId].forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course;
+                        option.textContent = course;
+                        courseSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+
+        // 作业选择依赖
+        document.getElementById('submission-course-id').addEventListener('change', function() {
+            const courseId = this.value;
+            const assignmentSelect = document.getElementById('submission-assignment-id');
+            assignmentSelect.disabled = !courseId;
+            
+            // 清空现有选项
+            assignmentSelect.innerHTML = '<option value="">请选择作业</option>';
+            
+            if (courseId) {
+                // 根据课程ID添加对应的作业选项
+                const assignments = {
+                    '微积分基础': ['极限与连续性练习', '导数应用'],
+                    '矩阵运算': ['行列式计算作业', '矩阵变换'],
+                    '编程入门': ['第一个编程项目', '算法练习'],
+                    '力学原理': ['牛顿定律应用', '动量守恒'],
+                    '学术写作技巧': ['文献综述', '研究方法']
+                };
+                
+                if (assignments[courseId]) {
+                    assignments[courseId].forEach(assignment => {
+                        const option = document.createElement('option');
+                        option.value = assignment;
+                        option.textContent = assignment;
+                        assignmentSelect.appendChild(option);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

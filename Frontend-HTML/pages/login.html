@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 教育系统</title>
+    
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 48px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .login-logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #3B82F6;
+            margin-bottom: 8px;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        .login-form {
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background-color: #F9FAFB;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: white;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-footer {
+            text-align: center;
+            color: #6B7280;
+            font-size: 14px;
+        }
+        
+        .login-footer a {
+            color: #3B82F6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .role-tabs {
+            display: flex;
+            margin-bottom: 24px;
+            background-color: #F3F4F6;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        
+        .role-tab {
+            flex: 1;
+            padding: 8px 16px;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #6B7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+        }
+        
+        .role-tab.active {
+            background: white;
+            color: #3B82F6;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .error-message {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 24px;
+                margin: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">EduSystem</div>
+            <h1 class="login-title">欢迎登录</h1>
+            <p class="login-subtitle">请选择您的身份并登录系统</p>
+        </div>
+        
+        <div class="role-tabs">
+            <button class="role-tab active" data-role="TEACHER">教师</button>
+            <button class="role-tab" data-role="STUDENT">学生</button>
+        </div>
+        
+        <div class="error-message" id="error-message"></div>
+        
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <label class="form-label" for="email">邮箱</label>
+                <input type="email" id="email" class="form-input" placeholder="请输入邮箱" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password">密码</label>
+                <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+            </div>
+            
+            <button type="submit" class="login-btn" id="login-btn">
+                <span class="loading-spinner" id="loading-spinner"></span>
+                <span id="btn-text">登录</span>
+            </button>
+        </form>
+        
+        <div class="login-footer">
+            <p>还没有账号？<a href="#" id="register-link">立即注册</a></p>
+        </div>
+    </div>
+    
+    <!-- 引入脚本 -->
+    <script src="../js/common.js"></script>
+    <script src="../js/api.js"></script>
+    
+    <script>
+        // 登录应用
+        const LoginApp = {
+            currentRole: 'TEACHER',
+            
+            init() {
+                this.bindEvents();
+                
+                // 防止在登录页面上无限重定向
+                const redirectCount = sessionStorage.getItem('loginRedirectCount') || 0;
+                if (redirectCount > 3) {
+                    console.error('登录页面检测到重定向循环，停止重定向');
+                    sessionStorage.removeItem('loginRedirectCount');
+                    return;
+                }
+                
+                // 检查EduSystem是否可用
+                if (typeof EduSystem !== 'undefined' && EduSystem.Utils && EduSystem.Utils.isLoggedIn) {
+                    // 如果已经登录，直接跳转
+                    if (EduSystem.Utils.isLoggedIn()) {
+                        sessionStorage.setItem('loginRedirectCount', parseInt(redirectCount) + 1);
+                        this.redirectToDashboard();
+                    }
+                } else {
+                    // EduSystem不可用，检查localStorage
+                    try {
+                        const token = localStorage.getItem('edu_token');
+                        const user = localStorage.getItem('edu_user');
+                        
+                        if (token && user) {
+                            sessionStorage.setItem('loginRedirectCount', parseInt(redirectCount) + 1);
+                            this.redirectToDashboard();
+                        }
+                    } catch (error) {
+                        console.error('检查登录状态失败:', error);
+                    }
+                }
+            },
+            
+            bindEvents() {
+                // 角色切换
+                document.querySelectorAll('.role-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        this.switchRole(e.target.dataset.role);
+                    });
+                });
+                
+                // 登录表单
+                document.getElementById('login-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.login();
+                });
+                
+                // 注册链接
+                document.getElementById('register-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (typeof EduSystem !== 'undefined' && EduSystem.Notification) {
+                        EduSystem.Notification.show('注册功能开发中...', 'info');
+                    } else {
+                        // 简单的提示
+                        alert('注册功能开发中...');
+                    }
+                });
+            },
+            
+            switchRole(role) {
+                this.currentRole = role;
+                
+                // 更新标签样式
+                document.querySelectorAll('.role-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-role="${role}"]`).classList.add('active');
+                
+                // 更新标题
+                const titles = {
+                    'TEACHER': '教师控制台',
+                    'STUDENT': '学生学习空间'
+                };
+                document.querySelector('.login-title').textContent = '欢迎登录' + titles[role].substring(2);
+            },
+            
+            async login() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (!email || !password) {
+                    this.showError('请输入邮箱和密码');
+                    return;
+                }
+                
+                // 邮箱验证
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    this.showError('请输入有效的邮箱地址');
+                    return;
+                }
+                
+                this.setLoading(true);
+                
+                try {
+                    let response;
+                    
+                    // 检查EduSystem是否可用
+                    if (typeof EduSystem !== 'undefined' && EduSystem.API && EduSystem.API.auth) {
+                        response = await EduSystem.API.auth.login({
+                            email,
+                            password,
+                            role: this.currentRole
+                        });
+                        
+                        // 保存token和用户信息
+                        EduSystem.Utils.setToken(response.token);
+                        EduSystem.Utils.setCurrentUser(response.user);
+                        
+                        // 显示成功提示
+                        if (EduSystem.Notification) {
+                            EduSystem.Notification.show('登录成功', 'success');
+                        }
+                    } else {
+                        // 模拟登录（用于演示）
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        
+                        response = {
+                            token: 'demo-token-' + Date.now(),
+                            user: {
+                                id: 1,
+                                email: email,
+                                username: email.split('@')[0],
+                                role: this.currentRole,
+                                avatar: null
+                            }
+                        };
+                        
+                        // 手动保存到localStorage
+                        localStorage.setItem('edu_token', response.token);
+                        localStorage.setItem('edu_user', JSON.stringify(response.user));
+                        
+                        // 显示成功提示
+                        this.showSuccess('登录成功');
+                    }
+                    
+                    // 延迟跳转，让用户看到成功提示
+                    setTimeout(() => {
+                        this.redirectToDashboard();
+                    }, 1000);
+                    
+                } catch (error) {
+                    this.showError(error.message || '登录失败，请检查用户名和密码');
+                    this.setLoading(false);
+                }
+            },
+            
+            redirectToDashboard() {
+                // 清除重定向计数
+                sessionStorage.removeItem('redirectCount');
+                sessionStorage.removeItem('loginRedirectCount');
+                
+                let user;
+                
+                // 尝试从EduSystem获取用户信息
+                if (typeof EduSystem !== 'undefined' && EduSystem.Utils) {
+                    user = EduSystem.Utils.getCurrentUser();
+                } else {
+                    // 从localStorage获取用户信息
+                    try {
+                        const userStr = localStorage.getItem('edu_user');
+                        user = userStr ? JSON.parse(userStr) : null;
+                    } catch (error) {
+                        console.error('获取用户信息失败:', error);
+                    }
+                }
+                
+                if (!user) return;
+                
+                const routes = {
+                    'TEACHER': '/pages/teacher.html',
+                    'STUDENT': '/pages/student.html'
+                };
+                
+                const route = routes[user.role];
+                if (route) {
+                    console.log('重定向到用户仪表板，角色:', user.role);
+                    window.location.href = route;
+                }
+            },
+            
+            setLoading(isLoading) {
+                const btn = document.getElementById('login-btn');
+                const spinner = document.getElementById('loading-spinner');
+                const btnText = document.getElementById('btn-text');
+                
+                if (isLoading) {
+                    btn.disabled = true;
+                    spinner.style.display = 'inline-block';
+                    btnText.textContent = '登录中...';
+                } else {
+                    btn.disabled = false;
+                    spinner.style.display = 'none';
+                    btnText.textContent = '登录';
+                }
+            },
+            
+            showError(message) {
+                const errorElement = document.getElementById('error-message');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                
+                // 5秒后自动隐藏
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 5000);
+            },
+            
+            showSuccess(message) {
+                // 创建成功提示元素
+                const successDiv = document.createElement('div');
+                successDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background-color: #d1fae5;
+                    color: #065f46;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    z-index: 9999;
+                    font-size: 14px;
+                `;
+                successDiv.textContent = message;
+                
+                document.body.appendChild(successDiv);
+                
+                // 3秒后自动移除
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.parentNode.removeChild(successDiv);
+                    }
+                }, 3000);
+            }
+        };
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            LoginApp.init();
+        });
+    </script>
+</body>
+</html>

@@ -42,13 +42,12 @@ public class FileUploadController {
             throw new IllegalArgumentException("请选择要上传的文件");
         }
 
-        // 检查文件大小 (100MB)
+        // 检查文件大小
         if (file.getSize() > 100 * 1024 * 1024) {
             throw new IllegalArgumentException("文件大小超出限制，请选择小于100MB的文件");
         }
 
         try {
-            // 检查文件类型
             String originalFilename = file.getOriginalFilename();
             if (originalFilename != null) {
                 String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
@@ -68,7 +67,6 @@ public class FileUploadController {
                 }
             }
 
-            // 创建上传目录（如果不存在）
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);

@@ -1,0 +1,538 @@
+/* 教师端专用样式 */
+
+/* 教师端全局样式 */
+body {
+  background-color: #F9FAFB;
+  color: #374151;
+}
+
+/* 教师端主内容区域 */
+.teacher-main {
+  margin-left: 256px;
+  padding: 32px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* 教师端侧边栏特殊样式 */
+.teacher-sidebar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.teacher-sidebar .sidebar-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.teacher-sidebar .sidebar-title {
+  color: white;
+}
+
+.teacher-sidebar .sidebar-user-email {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.teacher-sidebar .sidebar-nav-item {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.teacher-sidebar .sidebar-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.teacher-sidebar .sidebar-nav-item.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.teacher-sidebar .sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 教师端卡片样式 */
+.teacher-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E5E7EB;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.teacher-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* 教师端统计卡片 */
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #F3F4F6;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.stats-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.stats-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.stats-card-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+  margin: 8px 0;
+}
+
+.stats-card-description {
+  font-size: 14px;
+  color: #6B7280;
+}
+
+.stats-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.stats-card-icon.blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+.stats-card-icon.green {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+.stats-card-icon.yellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+}
+
+/* 教师端表单样式 */
+.teacher-form {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #F3F4F6;
+  padding: 32px;
+}
+
+.teacher-form-group {
+  margin-bottom: 24px;
+}
+
+.teacher-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.teacher-form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #F9FAFB;
+}
+
+.teacher-form-control:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: white;
+}
+
+.teacher-form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* 教师端按钮样式 */
+.teacher-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.teacher-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(102, 126, 234, 0.4), 0 2px 4px -1px rgba(102, 126, 234, 0.3);
+}
+
+.teacher-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.4), 0 4px 6px -2px rgba(102, 126, 234, 0.3);
+}
+
+.teacher-btn-secondary {
+  background-color: #F3F4F6;
+  color: #374151;
+  border: 2px solid #E5E7EB;
+}
+
+.teacher-btn-secondary:hover {
+  background-color: #E5E7EB;
+}
+
+.teacher-btn-danger {
+  background-color: #EF4444;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4), 0 2px 4px -1px rgba(239, 68, 68, 0.3);
+}
+
+.teacher-btn-danger:hover {
+  background-color: #DC2626;
+  transform: translateY(-2px);
+}
+
+/* 教师端表格样式 */
+.teacher-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.teacher-table th {
+  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.teacher-table td {
+  padding: 16px;
+  border-bottom: 1px solid #F3F4F6;
+  color: #374151;
+}
+
+.teacher-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.teacher-table tbody tr:hover {
+  background-color: #F9FAFB;
+}
+
+.teacher-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 教师端活动列表 */
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid #F3F4F6;
+  transition: all 0.2s ease;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-item:hover {
+  background-color: #F9FAFB;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-radius: 8px;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.activity-icon.blue {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3B82F6;
+}
+
+.activity-icon.green {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+.activity-icon.yellow {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-title {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.activity-description {
+  font-size: 14px;
+  color: #6B7280;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* 教师端模态框样式 */
+.teacher-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.teacher-modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.teacher-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.teacher-modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.teacher-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.teacher-modal-close:hover {
+  background-color: #F3F4F6;
+  color: #374151;
+}
+
+.teacher-modal-body {
+  padding: 24px;
+}
+
+.teacher-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 24px;
+  border-top: 1px solid #E5E7EB;
+  gap: 12px;
+}
+
+/* 教师端评分表单 */
+.grade-form {
+  background: #F9FAFB;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.grade-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.grade-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 教师端文件上传区域 */
+.upload-area {
+  border: 2px dashed #D1D5DB;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  border-color: #3B82F6;
+  background-color: #F0F9FF;
+}
+
+.upload-area.dragover {
+  border-color: #3B82F6;
+  background-color: #EFF6FF;
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: #9CA3AF;
+  margin-bottom: 16px;
+}
+
+.upload-text {
+  font-size: 16px;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #9CA3AF;
+}
+
+/* 教师端响应式设计 */
+@media (max-width: 1024px) {
+  .teacher-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+  
+  .teacher-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .teacher-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .stats-card {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .teacher-main {
+    padding: 12px;
+  }
+  
+  .teacher-card,
+  .teacher-form {
+    padding: 16px;
+  }
+  
+  .stats-card-value {
+    font-size: 24px;
+  }
+  
+  .teacher-table th,
+  .teacher-table td {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+  
+  .teacher-modal-content {
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+  
+  .teacher-modal-header,
+  .teacher-modal-body,
+  .teacher-modal-footer {
+    padding: 16px;
+  }
+}

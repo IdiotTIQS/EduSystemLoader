@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>前端系统测试页面</h1>
+    
+    <div class="test-section">
+        <h2>localStorage 测试</h2>
+        <button class="btn btn-primary" onclick="testLocalStorage()">测试localStorage</button>
+        <div id="localStorage-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>登录状态测试</h2>
+        <button class="btn btn-success" onclick="simulateTeacherLogin()">模拟教师登录</button>
+        <button class="btn btn-success" onclick="simulateStudentLogin()">模拟学生登录</button>
+        <button class="btn btn-danger" onclick="clearLogin()">清除登录状态</button>
+        <div id="login-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>页面跳转测试</h2>
+        <button class="btn btn-primary" onclick="goToLogin()">前往登录页面</button>
+        <button class="btn btn-primary" onclick="goToTeacher()">前往教师页面</button>
+        <button class="btn btn-primary" onclick="goToStudent()">前往学生页面</button>
+        <div id="redirect-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>当前状态</h2>
+        <div id="current-status"></div>
+    </div>
+
+    <script>
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function updateCurrentStatus() {
+            const token = localStorage.getItem('edu_token');
+            const userStr = localStorage.getItem('edu_user');
+            
+            let status = '<h3>当前状态:</h3>';
+            status += `<p><strong>Token:</strong> ${token ? '已设置' : '未设置'}</p>`;
+            
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    status += `<p><strong>用户:</strong> ${user.username || user.email}</p>`;
+                    status += `<p><strong>角色:</strong> ${user.role}</p>`;
+                    status += `<p><strong>邮箱:</strong> ${user.email}</p>`;
+                } catch (e) {
+                    status += `<p><strong>用户数据:</strong> 格式错误</p>`;
+                }
+            } else {
+                status += '<p><strong>用户:</strong> 未登录</p>';
+            }
+            
+            document.getElementById('current-status').innerHTML = status;
+        }
+        
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'test-value');
+                const value = localStorage.getItem('test');
+                if (value === 'test-value') {
+                    showStatus('localStorage-status', 'localStorage 工作正常', 'success');
+                    localStorage.removeItem('test');
+                } else {
+                    showStatus('localStorage-status', 'localStorage 工作异常', 'error');
+                }
+            } catch (e) {
+                showStatus('localStorage-status', `localStorage 错误: ${e.message}`, 'error');
+            }
+        }
+        
+        function simulateTeacherLogin() {
+            const userData = {
+                id: 1,
+                username: 'teacher',
+                email: 'teacher@example.com',
+                role: 'TEACHER',
+                avatar: null
+            };
+            
+            localStorage.setItem('edu_token', 'demo-teacher-token-' + Date.now());
+            localStorage.setItem('edu_user', JSON.stringify(userData));
+            
+            showStatus('login-status', '教师登录模拟成功', 'success');
+            updateCurrentStatus();
+        }
+        
+        function simulateStudentLogin() {
+            const userData = {
+                id: 2,
+                username: 'student',
+                email: 'student@example.com',
+                role: 'STUDENT',
+                avatar: null
+            };
+            
+            localStorage.setItem('edu_token', 'demo-student-token-' + Date.now());
+            localStorage.setItem('edu_user', JSON.stringify(userData));
+            
+            showStatus('login-status', '学生登录模拟成功', 'success');
+            updateCurrentStatus();
+        }
+        
+        function clearLogin() {
+            localStorage.removeItem('edu_token');
+            localStorage.removeItem('edu_user');
+            showStatus('login-status', '登录状态已清除', 'info');
+            updateCurrentStatus();
+        }
+        
+        function goToLogin() {
+            showStatus('redirect-status', '正在跳转到登录页面...', 'info');
+            setTimeout(() => {
+                window.location.href = '/pages/login.html';
+            }, 1000);
+        }
+        
+        function goToTeacher() {
+            const userStr = localStorage.getItem('edu_user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.role === 'TEACHER') {
+                        showStatus('redirect-status', '正在跳转到教师页面...', 'info');
+                        setTimeout(() => {
+                            window.location.href = '/pages/teacher.html';
+                        }, 1000);
+                    } else {
+                        showStatus('redirect-status', '当前用户不是教师角色', 'error');
+                    }
+                } catch (e) {
+                    showStatus('redirect-status', '用户数据格式错误', 'error');
+                }
+            } else {
+                showStatus('redirect-status', '请先登录', 'error');
+            }
+        }
+        
+        function goToStudent() {
+            const userStr = localStorage.getItem('edu_user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    if (user.role === 'STUDENT') {
+                        showStatus('redirect-status', '正在跳转到学生页面...', 'info');
+                        setTimeout(() => {
+                            window.location.href = '/pages/student.html';
+                        }, 1000);
+                    } else {
+                        showStatus('redirect-status', '当前用户不是学生角色', 'error');
+                    }
+                } catch (e) {
+                    showStatus('redirect-status', '用户数据格式错误', 'error');
+                }
+            } else {
+                showStatus('redirect-status', '请先登录', 'error');
+            }
+        }
+        
+        // 页面加载时更新状态
+        document.addEventListener('DOMContentLoaded', updateCurrentStatus);
+    </script>
+</body>
+</html>

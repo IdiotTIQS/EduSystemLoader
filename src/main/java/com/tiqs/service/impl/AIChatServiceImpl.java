@@ -45,12 +45,9 @@ public class AIChatServiceImpl implements AIChatService {
     @Override
     public AIChatResponse chat(AIChatRequest request) {
         try {
-            // 获取选择的模型，默认使用 tstars2.0
             String selectedModel = request.getModel() != null ? request.getModel() : "tstars2.0";
             
             log.info("AI问答请求 userId={} question={} model={}", request.getUserId(), request.getQuestion(), selectedModel);
-            
-            // 直接调用无工具的API，避免超时
             String answer = callAIApiWithoutTools(request, selectedModel);
 
             AIChatResponse response = new AIChatResponse();
@@ -85,16 +82,12 @@ public class AIChatServiceImpl implements AIChatService {
 
     private String callAIApiWithoutTools(AIChatRequest request, String model) {
         try {
-            // 构建消息 - 直接使用用户问题，不包含工具调用
             Map<String, Object> message = new HashMap<>();
             message.put("role", "user");
             message.put("content", buildPrompt(request));
-            
-            // 构建响应格式对象
             Map<String, Object> responseFormat = new HashMap<>();
             responseFormat.put("type", "text");
-            
-            // 构建请求参数 - 优化性能，禁用思考模式
+
             Map<String, Object> apiRequestBody = new HashMap<>();
             apiRequestBody.put("model", model);
             apiRequestBody.put("messages", Arrays.asList(message));
@@ -108,18 +101,13 @@ public class AIChatServiceImpl implements AIChatService {
             apiRequestBody.put("include_reasoning", false);
             apiRequestBody.put("disable_search", true);
             apiRequestBody.put("disable_tools", true);
-            
-            // 转换为JSON字符串
             String jsonBody = objectMapper.writeValueAsString(apiRequestBody);
             log.info("发送AI请求(无工具): {}", jsonBody);
-            
-            // 使用配置的API URL
             String targetUrl = apiUrl;
             if (targetUrl == null || targetUrl.isEmpty()) {
                 targetUrl = "https://apis.iflow.cn/v1/chat/completions";
             }
-            
-            // 发送请求 - 增加超时设置
+
             HttpResponse<String> response = Unirest.post(targetUrl)
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")

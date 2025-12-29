@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学生学习空间</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+  
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/student.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {},
+          },
+          borderRadius: {
+            'none': '0px',
+            'sm': '2px',
+            DEFAULT: '4px',
+            'md': '8px',
+            'lg': '12px',
+            'xl': '16px',
+            '2xl': '20px',
+            '3xl': '24px',
+            'full': '9999px',
+            'button': '4px'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      min-height: 1024px;
+    }
+    
+    .font-pacifico {
+      font-family: "Pacifico", serif;
+    }
+    
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.3s ease;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="flex h-screen">
+    <!-- Sidebar for desktop -->
+    <aside class="hidden md:flex flex-col w-64 bg-white shadow-lg fixed h-full z-10">
+      <div class="p-6 border-b border-gray-200">
+        <h1 class="text-xl font-bold text-blue-600 font-pacifico">logo</h1>
+        <div class="mt-4 flex items-center">
+          <img src="https://ai-public.mastergo.com/ai/img_res/e4041d4a168a22dfda22e045efc29624.jpg" alt="User Avatar" class="w-10 h-10 rounded-full object-cover">
+          <div class="ml-3">
+            <p class="font-medium">李子涵</p>
+            <p class="text-sm text-gray-500">2023级计算机科学</p>
+          </div>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md my-class-tab">
+          <i class="fas fa-users mr-3 w-5 h-5 flex justify-center items-center"></i>我的班级
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 class-members-tab">
+          <i class="fas fa-user-friends mr-3 w-5 h-5 flex justify-center items-center"></i>班级成员
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 course-info-tab">
+          <i class="fas fa-book-open mr-3 w-5 h-5 flex justify-center items-center"></i>课程信息
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 assignments-tab">
+          <i class="fas fa-tasks mr-3 w-5 h-5 flex justify-center items-center"></i>作业提交
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 discussions-tab">
+          <i class="fas fa-comments mr-3 w-5 h-5 flex justify-center items-center"></i>班级讨论
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 cloud-drive-tab">
+          <i class="fas fa-cloud-download-alt mr-3 w-5 h-5 flex justify-center items-center"></i>班级云盘
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 profile-tab">
+          <i class="fas fa-user-circle mr-3 w-5 h-5 flex justify-center items-center"></i>个人信息
+        </a>
+      </nav>
+      <div class="p-4 border-t border-gray-200">
+        <button class="w-full py-3 text-left text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+          <i class="fas fa-sign-out-alt mr-3 w-5 h-5 flex justify-center items-center"></i>退出登录
+        </button>
+      </div>
+    </aside>
+
+    <!-- Mobile top navigation -->
+    <div class="md:hidden fixed top-0 left-0 right-0 bg-white shadow z-20 p-4 flex justify-between items-center">
+      <h1 class="text-lg font-bold text-blue-600 font-pacifico">logo</h1>
+      <button id="mobile-menu-toggle" class="text-gray-600 focus:outline-none">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Mobile sidebar drawer -->
+    <div id="mobile-overlay" class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+    <aside id="mobile-sidebar" class="md:hidden fixed top-16 left-0 bottom-0 w-64 bg-white shadow-lg z-40 overflow-y-auto transform transition-transform duration-300 ease-in-out -translate-x-full">
+      <nav class="px-4 py-6 space-y-2">
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md my-class-tab">
+          <i class="fas fa-users mr-3 w-5 h-5 flex justify-center items-center"></i>我的班级
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 class-members-tab">
+          <i class="fas fa-user-friends mr-3 w-5 h-5 flex justify-center items-center"></i>班级成员
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 course-info-tab">
+          <i class="fas fa-book-open mr-3 w-5 h-5 flex justify-center items-center"></i>课程信息
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 assignments-tab">
+          <i class="fas fa-tasks mr-3 w-5 h-5 flex justify-center items-center"></i>作业提交
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 discussions-tab">
+          <i class="fas fa-comments mr-3 w-5 h-5 flex justify-center items-center"></i>班级讨论
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 cloud-drive-tab">
+          <i class="fas fa-cloud-download-alt mr-3 w-5 h-5 flex justify-center items-center"></i>班级云盘
+        </a>
+        <a href="#" class="block px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 profile-tab">
+          <i class="fas fa-user-circle mr-3 w-5 h-5 flex justify-center items-center"></i>个人信息
+        </a>
+      </nav>
+      <div class="p-4 border-t border-gray-200">
+        <button class="w-full py-3 text-left text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+          <i class="fas fa-sign-out-alt mr-3 w-5 h-5 flex justify-center items-center"></i>退出登录
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content area -->
+    <main class="flex-1 md:ml-64 mt-16 md:mt-0 p-6 transition-all duration-300">
+      <!-- Page header -->
+      <header class="mb-8">
+        <h1 id="page-title" class="text-2xl font-bold capitalize">我的班级</h1>
+        <p id="page-description" class="text-gray-600 mt-2">管理您已加入的班级，查看班级成员和课程信息</p>
+      </header>
+
+      <!-- Content sections based on active tab -->
+      <div id="content-container">
+        <!-- My Class Section -->
+        <div id="my-class-content" class="space-y-6 fade-in">
+          <!-- Join Class Form -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">加入新班级</h2>
+            <form id="join-class-form" class="flex gap-4">
+              <input type="text" placeholder="请输入班级邀请码" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <button type="submit" class="!rounded-button whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 transition-colors">加入班级</button>
+            </form>
+          </div>
+
+          <!-- Joined Classes Tabs -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-lg font-semibold">已加入班级</h2>
+              <span class="text-gray-500" id="class-count">2 个班级</span>
+            </div>
+            <div class="flex flex-wrap gap-2" id="class-tabs">
+              <button class="px-4 py-2 rounded-lg transition-colors bg-blue-100 text-blue-700 font-medium">高等数学 A</button>
+              <button class="px-4 py-2 rounded-lg transition-colors bg-gray-100 hover:bg-gray-200">数据结构与算法</button>
+            </div>
+          </div>
+
+          <!-- Class Members Preview -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">班级成员</h2>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学号</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">电话</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">加入时间</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200" id="class-members-table">
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">STU001</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">李子涵</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">lizihan@example.com</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">13800138001</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-09-01</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">STU002</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">王思雨</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">wangsiyu@example.com</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">13800138002</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-09-01</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">STU003</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">张浩然</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">zhanghaoran@example.com</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">13800138003</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-09-02</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Class Members Section -->
+        <div id="class-members-content" class="space-y-6 fade-in hidden">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-lg font-semibold">班级成员</h2>
+              <button id="back-to-class-btn" class="text-blue-600 hover:text-blue-800 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>返回班级列表
+              </button>
+            </div>
+            <p class="mb-4"><strong>当前班级：</strong>高等数学 A (CLS001)</p>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学号</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">电话</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">加入时间</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">STU001</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">李子涵</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">lizihan@example.com</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">13800138001</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-09-01</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">STU002</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">王思雨</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">wangsiyu@example.com</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">13800138002</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-09-01</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">STU003</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">张浩然</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">zhanghaoran@example.com</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">13800138003</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-09-02</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Course Info Section -->
+        <div id="course-info-content" class="space-y-6 fade-in hidden">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">课程信息</h2>
+            <p class="mb-4"><strong>当前班级 ID：</strong>CLS001</p>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">课程名称</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">微积分基础</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">极限、导数与积分的基础概念</td>
+                  <td class="px-4 py-3 text-sm">
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">正在学习</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">线性代数</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">矩阵运算与向量空间理论</td>
+                  <td class="px-4 py-3 text-sm">
+                    <button class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs hover:bg-blue-200 transition-colors">选中</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Assignments Section -->
+        <div id="assignments-content" class="space-y-6 fade-in hidden">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">作业列表</h2>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">作业名称</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">截止时间</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200" id="assignments-table">
+                <tr class="cursor-pointer hover:bg-gray-50 transition-colors bg-blue-50">
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">第一章习题</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-10-15 23:59</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">完成教材第一页至第十页的所有练习题</td>
+                  <td class="px-4 py-3 text-sm">
+                    <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">已提交</span>
+                  </td>
+                </tr>
+                <tr class="cursor-pointer hover:bg-gray-50 transition-colors">
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">实验报告一</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">2023-10-20 23:59</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">撰写关于数组操作的实验报告</td>
+                  <td class="px-4 py-3 text-sm">
+                    <span class="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">未提交</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Assignment Submission Form -->
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">提交作业：第一章习题</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">答案内容</label>
+                <textarea rows="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">上传文件</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 transition-colors" id="file-drop-area">
+                  <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                  <p class="text-gray-600">拖拽文件到这里或点击上传</p>
+                  <p class="text-xs text-gray-500 mt-1">支持 .pdf, .doc, .docx, .txt, .jpg, .jpeg, .png, .gif, .zip, .rar (最大 100MB)</p>
+                  <input type="file" multiple class="hidden" id="file-input">
+                  <button class="mt-3 !rounded-button whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 transition-colors" id="choose-file-btn">选择文件</button>
+                </div>
+                <div class="mt-4 hidden" id="uploaded-files-container">
+                  <h3 class="text-sm font-medium text-gray-700 mb-2">已上传文件</h3>
+                  <ul class="space-y-2" id="uploaded-files-list">
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+              <button class="!rounded-button whitespace-nowrap px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">重置</button>
+              <button class="!rounded-button whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 transition-colors flex items-center">
+                <span>更新提交</span>
+              </button>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+              <p><strong>上次提交时间：</strong>2023-10-10 14:30</p>
+              <p><strong>评分状态：</strong>优秀</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Discussions Section -->
+        <div id="discussions-content" class="space-y-6 fade-in hidden">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">班级讨论</h2>
+            <div class="mb-6">
+              <h3 class="text-md font-medium mb-3">创建新讨论</h3>
+              <div class="flex gap-3">
+                <input type="text" placeholder="讨论标题" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <button class="!rounded-button whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 transition-colors">发布</button>
+              </div>
+              <textarea rows="3" placeholder="讨论内容..." class="w-full mt-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+            </div>
+            <div>
+              <h3 class="text-md font-medium mb-3">讨论列表</h3>
+              <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                  <div class="flex justify-between">
+                    <h4 class="font-medium text-gray-900">关于本周课程难点讨论</h4>
+                    <span class="text-xs text-gray-500">2023-10-05 10:00</span>
+                  </div>
+                  <p class="mt-2 text-gray-700">大家觉得本周的递归算法部分有什么难以理解的地方吗？我们可以一起探讨。</p>
+                  <div class="mt-3 flex items-center text-sm text-gray-500">
+                    <span>李子涵</span>
+                    <span class="mx-2">•</span>
+                    <span>1 条回复</span>
+                  </div>
+                  <div class="mt-3">
+                    <textarea rows="2" placeholder="写下你的回复..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    <div class="mt-2 flex justify-end">
+                      <button class="!rounded-button whitespace-nowrap text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 transition-colors">回复</button>
+                    </div>
+                  </div>
+                  <div class="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
+                    <div class="text-sm">
+                      <div class="flex justify-between">
+                        <span class="font-medium text-gray-900">王思雨</span>
+                        <span class="text-xs text-gray-500">2023-10-05 11:30</span>
+                      </div>
+                      <p class="mt-1 text-gray-700">我觉得递归终止条件这部分比较绕，有没有更清晰的理解方法？</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cloud Drive Section -->
+        <div id="cloud-drive-content" class="space-y-6 fade-in hidden">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">班级云盘</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:shadow-sm transition-shadow">
+                <div class="flex items-center">
+                  <i class="fas fa-file-alt text-blue-500 text-xl mr-3"></i>
+                  <div>
+                    <p class="font-medium text-gray-900 truncate max-w-[150px]">课程大纲.pdf</p>
+                    <p class="text-xs text-gray-500">2.3 MB</p>
+                  </div>
+                </div>
+                <a href="#" download class="text-blue-600 hover:text-blue-800">
+                  <i class="fas fa-download"></i>
+                </a>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:shadow-sm transition-shadow">
+                <div class="flex items-center">
+                  <i class="fas fa-file-alt text-blue-500 text-xl mr-3"></i>
+                  <div>
+                    <p class="font-medium text-gray-900 truncate max-w-[150px]">第一周课件.pptx</p>
+                    <p class="text-xs text-gray-500">5.1 MB</p>
+                  </div>
+                </div>
+                <a href="#" download class="text-blue-600 hover:text-blue-800">
+                  <i class="fas fa-download"></i>
+                </a>
+              </div>
+              <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between hover:shadow-sm transition-shadow">
+                <div class="flex items-center">
+                  <i class="fas fa-file-archive text-blue-500 text-xl mr-3"></i>
+                  <div>
+                    <p class="font-medium text-gray-900 truncate max-w-[150px]">参考资料.zip</p>
+                    <p class="text-xs text-gray-500">12.7 MB</p>
+                  </div>
+                </div>
+                <a href="#" download class="text-blue-600 hover:text-blue-800">
+                  <i class="fas fa-download"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile-content" class="space-y-6 fade-in hidden">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold mb-4">个人信息</h2>
+            <form class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">真实姓名</label>
+                <input type="text" value="李子涵" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                <input type="email" value="lizihan@example.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <p class="mt-1 text-sm text-red-600 hidden">请输入有效的邮箱地址</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">手机号</label>
+                <input type="tel" value="13800138001" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              </div>
+              <div class="pt-4 flex justify-end gap-3">
+                <button type="button" class="!rounded-button whitespace-nowrap px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">重置</button>
+                <button type="submit" class="!rounded-button whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 transition-colors">保存信息</button>
+              </div>
+            </form>
+            <div class="mt-6 text-sm text-gray-600">
+              <p><strong>信息同步说明：</strong>个人信息将在所有设备间保持同步，请确保填写的信息准确无误。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Toast notification -->
+    <div id="toast" class="fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-lg transition-transform duration-300 z-50 bg-green-100 text-green-800 hidden">
+      <div class="flex items-center">
+        <i class="fas fa-check-circle mr-2"></i>
+        <span id="toast-message">操作成功</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab navigation
+      const tabs = document.querySelectorAll('.my-class-tab, .class-members-tab, .course-info-tab, .assignments-tab, .discussions-tab, .cloud-drive-tab, .profile-tab');
+      const contents = {
+        'my-class': document.getElementById('my-class-content'),
+        'class-members': document.getElementById('class-members-content'),
+        'course-info': document.getElementById('course-info-content'),
+        'assignments': document.getElementById('assignments-content'),
+        'discussions': document.getElementById('discussions-content'),
+        'cloud-drive': document.getElementById('cloud-drive-content'),
+        'profile': document.getElementById('profile-content')
+      };
+      
+      const pageTitle = document.getElementById('page-title');
+      const pageDescription = document.getElementById('page-description');
+      
+      const pageTitles = {
+        'my-class': '我的班级',
+        'class-members': '班级成员',
+        'course-info': '课程信息',
+        'assignments': '作业提交',
+        'discussions': '班级讨论',
+        'cloud-drive': '班级云盘',
+        'profile': '个人信息'
+      };
+      
+      const pageDescriptions = {
+        'my-class': '管理您已加入的班级，查看班级成员和课程信息',
+        'class-members': '查看当前班级的所有成员信息',
+        'course-info': '浏览和选择当前班级提供的课程',
+        'assignments': '查看作业列表并提交您的作业',
+        'discussions': '参与班级讨论，与其他同学交流学习心得',
+        'cloud-drive': '访问班级共享文件资源',
+        'profile': '维护您的个人信息，确保信息同步准确'
+      };
+      
+      function switchTab(tabName) {
+        // Hide all content sections
+        Object.values(contents).forEach(content => {
+          content.classList.add('hidden');
+        });
+        
+        // Show selected content
+        contents[tabName].classList.remove('hidden');
+        
+        // Update page title and description
+        pageTitle.textContent = pageTitles[tabName];
+        pageDescription.textContent = pageDescriptions[tabName];
+      }
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Remove active class from all tabs
+          tabs.forEach(t => {
+            t.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-md');
+            t.classList.add('hover:bg-gray-100');
+          });
+          
+          // Add active class to clicked tab
+          this.classList.remove('hover:bg-gray-100');
+          this.classList.add('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-md');
+          
+          // Determine which tab was clicked
+          if (this.classList.contains('my-class-tab')) {
+            switchTab('my-class');
+          } else if (this.classList.contains('class-members-tab')) {
+            switchTab('class-members');
+          } else if (this.classList.contains('course-info-tab')) {
+            switchTab('course-info');
+          } else if (this.classList.contains('assignments-tab')) {
+            switchTab('assignments');
+          } else if (this.classList.contains('discussions-tab')) {
+            switchTab('discussions');
+          } else if (this.classList.contains('cloud-drive-tab')) {
+            switchTab('cloud-drive');
+          } else if (this.classList.contains('profile-tab')) {
+            switchTab('profile');
+          }
+        });
+      });
+      
+      // Mobile menu toggle
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const mobileOverlay = document.getElementById('mobile-overlay');
+      const mobileSidebar = document.getElementById('mobile-sidebar');
+      
+      mobileMenuToggle.addEventListener('click', function() {
+        mobileSidebar.classList.toggle('-translate-x-full');
+        mobileSidebar.classList.toggle('translate-x-0');
+        mobileOverlay.classList.toggle('hidden');
+      });
+      
+      mobileOverlay.addEventListener('click', function() {
+        mobileSidebar.classList.add('-translate-x-full');
+        mobileSidebar.classList.remove('translate-x-0');
+        mobileOverlay.classList.add('hidden');
+      });
+      
+      // Back to class button
+      document.getElementById('back-to-class-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        switchTab('my-class');
+        
+        // Update desktop tabs
+        tabs.forEach(t => {
+          t.classList.remove('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-md');
+          t.classList.add('hover:bg-gray-100');
+        });
+        
+        document.querySelector('.my-class-tab').classList.remove('hover:bg-gray-100');
+        document.querySelector('.my-class-tab').classList.add('bg-gradient-to-r', 'from-blue-500', 'to-indigo-600', 'text-white', 'shadow-md');
+      });
+      
+      // Assignment selection
+      const assignmentRows = document.querySelectorAll('#assignments-table tr');
+      assignmentRows.forEach(row => {
+        row.addEventListener('click', function() {
+          assignmentRows.forEach(r => r.classList.remove('bg-blue-50'));
+          this.classList.add('bg-blue-50');
+        });
+      });
+      
+      // File upload functionality
+      const fileDropArea = document.getElementById('file-drop-area');
+      const fileInput = document.getElementById('file-input');
+      const chooseFileBtn = document.getElementById('choose-file-btn');
+      const uploadedFilesContainer = document.getElementById('uploaded-files-container');
+      const uploadedFilesList = document.getElementById('uploaded-files-list');
+      
+      chooseFileBtn.addEventListener('click', function() {
+        fileInput.click();
+      });
+      
+      fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+          uploadedFilesContainer.classList.remove('hidden');
+          for (let i = 0; i < this.files.length; i++) {
+            addUploadedFile(this.files[i]);
+          }
+        }
+      });
+      
+      fileDropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('border-blue-400');
+      });
+      
+      fileDropArea.addEventListener('dragleave', function() {
+        this.classList.remove('border-blue-400');
+      });
+      
+      fileDropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('border-blue-400');
+        
+        if (e.dataTransfer.files.length > 0) {
+          uploadedFilesContainer.classList.remove('hidden');
+          for (let i = 0; i < e.dataTransfer.files.length; i++) {
+            addUploadedFile(e.dataTransfer.files[i]);
+          }
+        }
+      });
+      
+      function addUploadedFile(file) {
+        const li = document.createElement('li');
+        li.className = 'flex justify-between items-center bg-gray-50 p-2 rounded';
+        
+        const fileNameSpan = document.createElement('span');
+        fileNameSpan.className = 'text-sm truncate max-w-[70%]';
+        fileNameSpan.textContent = file.name;
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'text-red-500 hover:text-red-700';
+        removeBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        removeBtn.addEventListener('click', function() {
+          li.remove();
+          if (uploadedFilesList.children.length === 0) {
+            uploadedFilesContainer.classList.add('hidden');
+          }
+        });
+        
+        li.appendChild(fileNameSpan);
+        li.appendChild(removeBtn);
+        uploadedFilesList.appendChild(li);
+      }
+      
+      // Join class form
+      document.getElementById('join-class-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        showToast('成功加入班级！');
+      });
+      
+      // Toast notification
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        toastMessage.textContent = message;
+        
+        // Set color based on type
+        toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-lg transition-transform duration-300 z-50 ';
+        if (type === 'success') {
+          toast.classList.add('bg-green-100', 'text-green-800');
+        } else if (type === 'error') {
+          toast.classList.add('bg-red-100', 'text-red-800');
+        } else {
+          toast.classList.add('bg-yellow-100', 'text-yellow-800');
+        }
+        
+        toast.classList.remove('hidden');
+        
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3000);
+      }
+    });
+  </script>
+  
+  <!-- 权限检查和错误处理 -->
+  <script>
+    // 检查用户权限和登录状态
+    (function() {
+        try {
+            // 检查是否已登录
+            const token = localStorage.getItem('edu_token');
+            const userStr = localStorage.getItem('edu_user');
+            
+            if (!token || !userStr) {
+                // 未登录，重定向到登录页面
+                window.location.href = '/pages/login.html';
+                return;
+            }
+            
+            // 检查用户角色
+            const user = JSON.parse(userStr);
+            if (user.role !== 'STUDENT') {
+                // 不是学生，重定向到登录页面
+                window.location.href = '/pages/login.html';
+                return;
+            }
+            
+            // 检查token是否过期（简单检查）
+            const tokenParts = token.split('.');
+            if (tokenParts.length === 3) {
+                try {
+                    const payload = JSON.parse(atob(tokenParts[1]));
+                    const now = Date.now() / 1000;
+                    if (payload.exp && payload.exp < now) {
+                        // Token过期，重定向到登录页面
+                        localStorage.removeItem('edu_token');
+                        localStorage.removeItem('edu_user');
+                        window.location.href = '/pages/login.html';
+                        return;
+                    }
+                } catch (e) {
+                    // Token格式错误，重定向到登录页面
+                    localStorage.removeItem('edu_token');
+                    localStorage.removeItem('edu_user');
+                    window.location.href = '/pages/login.html';
+                    return;
+                }
+            }
+            
+            // 权限检查通过，继续加载页面
+            console.log('权限检查通过，加载学生学习空间');
+            
+        } catch (error) {
+            console.error('权限检查失败:', error);
+            // 出错时重定向到登录页面
+            window.location.href = '/pages/login.html';
+        }
+    })();
+  </script>
+  
+  <!-- 引入JavaScript文件 -->
+  <script src="../js/common.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/student.js"></script>
+</body>
+</html>

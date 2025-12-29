@@ -1,0 +1,722 @@
+/* 学生端专用样式 */
+
+/* 学生端全局样式 */
+body {
+  background-color: #F8FAFC;
+  color: #334155;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* 学生端主内容区域 */
+.student-main {
+  margin-left: 256px;
+  padding: 24px;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+/* 学生端侧边栏特殊样式 */
+.student-sidebar {
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-sidebar .sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.student-sidebar .sidebar-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #3B82F6;
+  font-family: "Pacifico", serif;
+  margin: 0;
+}
+
+.student-sidebar .sidebar-user {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.student-sidebar .sidebar-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.student-sidebar .sidebar-user-info {
+  margin-left: 12px;
+}
+
+.student-sidebar .sidebar-user-name {
+  font-weight: 600;
+  color: #1E293B;
+}
+
+.student-sidebar .sidebar-user-email {
+  font-size: 12px;
+  color: #64748B;
+}
+
+.student-sidebar .sidebar-nav {
+  flex: 1;
+  padding: 24px 16px;
+}
+
+.student-sidebar .sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: #475569;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.student-sidebar .sidebar-nav-item:hover {
+  background-color: #F1F5F9;
+  color: #334155;
+}
+
+.student-sidebar .sidebar-nav-item.active {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);
+}
+
+.student-sidebar .sidebar-nav-item i {
+  margin-right: 12px;
+  width: 20px;
+  text-align: center;
+}
+
+.student-sidebar .sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* 学生端移动端导航 */
+.student-mobile-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  z-index: 200;
+  padding: 16px;
+}
+
+.student-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.student-mobile-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #3B82F6;
+  font-family: "Pacifico", serif;
+}
+
+.student-mobile-menu-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #64748B;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.student-mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 300;
+}
+
+.student-mobile-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 256px;
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 400;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+}
+
+.student-mobile-sidebar.open {
+  transform: translateX(0);
+}
+
+/* 学生端卡片样式 */
+.student-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.student-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.student-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.student-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0;
+}
+
+.student-card-subtitle {
+  font-size: 14px;
+  color: #64748B;
+  margin-top: 4px;
+}
+
+/* 学生端班级加入表单 */
+.join-class-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.join-class-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.join-class-input:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.join-class-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);
+}
+
+.join-class-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+}
+
+/* 学生端标签页样式 */
+.class-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.class-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.class-tab:hover {
+  background-color: #F1F5F9;
+}
+
+.class-tab.active {
+  background-color: #EFF6FF;
+  color: #1D4ED8;
+  border-color: #3B82F6;
+}
+
+/* 学生端表格样式 */
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.student-table th {
+  background: #F8FAFC;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.student-table td {
+  padding: 16px;
+  border-bottom: 1px solid #F1F5F9;
+  color: #334155;
+  font-size: 14px;
+}
+
+.student-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.student-table tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+.student-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 学生端作业卡片 */
+.assignment-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.assignment-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.assignment-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1E293B;
+  margin: 0;
+}
+
+.assignment-deadline {
+  font-size: 14px;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.assignment-description {
+  color: #475569;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.assignment-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.assignment-status.pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.assignment-status.submitted {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.assignment-status.overdue {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+/* 学生端讨论样式 */
+.discussion-item {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.discussion-item:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.discussion-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.discussion-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
+.discussion-meta {
+  flex: 1;
+}
+
+.discussion-author {
+  font-weight: 600;
+  color: #1E293B;
+  margin-bottom: 4px;
+}
+
+.discussion-time {
+  font-size: 12px;
+  color: #64748B;
+}
+
+.discussion-content {
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.discussion-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.discussion-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #64748B;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.discussion-action:hover {
+  color: #3B82F6;
+}
+
+/* 学生端云盘文件样式 */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.file-item {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.file-item:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.file-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.file-icon.pdf {
+  color: #EF4444;
+}
+
+.file-icon.doc {
+  color: #3B82F6;
+}
+
+.file-icon.xls {
+  color: #10B981;
+}
+
+.file-icon.ppt {
+  color: #F59E0B;
+}
+
+.file-icon.zip {
+  color: #8B5CF6;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #1E293B;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 12px;
+  color: #64748B;
+  margin-bottom: 8px;
+}
+
+.file-download {
+  color: #3B82F6;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.file-download:hover {
+  color: #1D4ED8;
+}
+
+/* 学生端表单样式 */
+.student-form {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid #E2E8F0;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.student-form-group {
+  margin-bottom: 20px;
+}
+
+.student-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.student-form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background-color: #F8FAFC;
+}
+
+.student-form-control:focus {
+  outline: none;
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: white;
+}
+
+.student-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* 学生端按钮样式 */
+.student-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.student-btn-primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);
+}
+
+.student-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+}
+
+.student-btn-secondary {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 2px solid #E2E8F0;
+}
+
+.student-btn-secondary:hover {
+  background-color: #E2E8F0;
+}
+
+/* 学生端响应式设计 */
+@media (max-width: 1024px) {
+  .student-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+  
+  .student-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .student-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .student-mobile-nav {
+    display: block;
+  }
+  
+  .student-mobile-overlay {
+    display: block;
+  }
+  
+  .student-main {
+    margin-top: 64px;
+    padding: 12px;
+  }
+  
+  .student-card,
+  .student-form {
+    padding: 16px;
+  }
+  
+  .join-class-form {
+    flex-direction: column;
+  }
+  
+  .class-tabs {
+    flex-direction: column;
+  }
+  
+  .file-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  
+  .student-table th,
+  .student-table td {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+  
+  .assignment-card,
+  .discussion-item {
+    padding: 16px;
+  }
+}
+
+/* 学生端动画效果 */
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 学生端滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
